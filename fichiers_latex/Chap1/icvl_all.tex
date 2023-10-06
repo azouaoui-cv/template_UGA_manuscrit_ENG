@@ -1,0 +1,45 @@
+\documentclass{standalone}
+\begin{document}
+
+\def\arraystretch{1.2}
+\resizebox{\textwidth}{!}{
+	\begin{tabular}{c c c c c c c c c c c c}
+		\toprule
+		$\hspace{1pt}\sigma$ \hspace{1pt}            & Metrics    & Noisy       & BM3D        & BM4D        & GLF         & LLRT        & NGMeet                  & SMDS        & QRNN3D                  & T3SC                    & T3SC-SSL                \\ [0.5ex]
+		\hline\hline
+
+		\multirow{2}{*}{\hspace{5pt}  5            } & \mc{MPSNR} & \mc{34.47}  & \mc{46.17}  & \mc{48.85}  & \mc{51.25}  & \mc{51.86}  & \mc{\textbf{52.74}}     & \mc{50.91}  & \mc{48.80}              & \mc{\underline{52.62}}  & \mc{51.42}              \\
+		                                             & \mc{MSSIM} & \mc{0.7618} & \mc{0.9843} & \mc{0.9916} & \mc{0.9949} & \mc{0.9951} & \mc{\textbf{0.9960}}    & \mc{0.9944} & \mc{0.9918}             & \mc{\underline{0.9959}} & \mc{0.9952}             \\
+		\hline
+		\multirow{2}{*}{\hspace{5pt} 25 }            & \mc{MPSNR} & \mc{21.44}  & \mc{37.86}  & \mc{39.89}  & \mc{43.16}  & \mc{43.43}  & \mc{\underline{44.74}}  & \mc{42.83}  & \mc{44.20}              & \mc{\textbf{45.38}}     & \mc{44.73}              \\
+		                                             & \mc{MSSIM} & \mc{0.1548} & \mc{0.9269} & \mc{0.9510} & \mc{0.9695} & \mc{0.9746} & \mc{\underline{0.9796}} & \mc{0.9700} & \mc{0.9782}             & \mc{\textbf{0.9825}}    & \mc{0.9805}             \\
+		\hline
+		\multirow{2}{*}{\hspace{5pt} 50 }            & \mc{MPSNR} & \mc{16.03}  & \mc{34.22}  & \mc{34.22}  & \mc{39.26}  & \mc{39.69}  & \mc{41.08}              & \mc{39.25}  & \mc{\underline{41.67}}  & \mc{\textbf{42.16}}     & \mc{41.62}              \\
+		                                             & \mc{MSSIM} & \mc{0.0502} & \mc{0.8654} & \mc{0.8654} & \mc{0.9197} & \mc{0.9504} & \mc{0.9602}             & \mc{0.9382} & \mc{\underline{0.9655}} & \mc{\textbf{0.9677}}    & \mc{0.9646}             \\
+		\hline
+		\multirow{2}{*}{\hspace{5pt} 100 }           & \mc{MPSNR} & \mc{10.85}  & \mc{30.43}  & \mc{32.47}  & \mc{34.79}  & \mc{36.39}  & \mc{37.55}              & \mc{35.64}  & \mc{37.19}              & \mc{\textbf{38.99}}     & \mc{\underline{38.50}}  \\
+		                                             & \mc{MSSIM} & \mc{0.0144} & \mc{0.7557} & \mc{0.8155} & \mc{0.7982} & \mc{0.9182} & \mc{0.9311}             & \mc{0.8815} & \mc{0.9140}             & \mc{\textbf{0.9439}}    & \mc{\underline{0.9394}} \\
+		\hline
+		\hline
+		\multirow{2}{*}{\hspace{5pt} [0-15] }        & \mc{MPSNR} & \mc{33.89}  & \mc{45.81}  & \mc{45.35}  & \mc{50.57}  & \mc{48.50}  & \mc{41.67}              & \mc{48.23}  & \mc{\underline{52.07}}  & \mc{\textbf{53.31}}     & \mc{51.26}              \\
+		                                             & \mc{MSSIM} & \mc{0.6386} & \mc{0.9767} & \mc{0.9735} & \mc{0.9948} & \mc{0.9899} & \mc{0.9078}             & \mc{0.9900} & \mc{\underline{0.9957}} & \mc{\textbf{0.9967}}    & \mc{0.9955}             \\
+		\hline
+		\multirow{2}{*}{\hspace{5pt}[0-55] }         & \mc{MPSNR} & \mc{23.36}  & \mc{39.06}  & \mc{38.43}  & \mc{44.22}  & \mc{41.13}  & \mc{32.94}              & \mc{41.76}  & \mc{\underline{47.13}}  & \mc{\textbf{48.64}}     & \mc{46.82}              \\
+		                                             & \mc{MSSIM} & \mc{0.2601} & \mc{0.9231} & \mc{0.9074} & \mc{0.9818} & \mc{0.9580} & \mc{0.7565}             & \mc{0.9620} & \mc{\underline{0.9884}} & \mc{\textbf{0.9911}}    & \mc{0.9882}             \\
+		\hline
+		\multirow{2}{*}{\hspace{5pt}[0-95] }         & \mc{MPSNR} & \mc{19.06}  & \mc{36.17}  & \mc{35.55}  & \mc{41.43}  & \mc{38.44}  & \mc{29.40}              & \mc{38.94}  & \mc{43.98}              & \mc{\textbf{46.30}}     & \mc{\underline{44.75}}  \\
+		                                             & \mc{MSSIM} & \mc{0.1614} & \mc{0.8760} & \mc{0.8540} & \mc{0.9674} & \mc{0.9354} & \mc{0.6609}             & \mc{0.9357} & \mc{0.9753}             & \mc{\textbf{0.9859}}    & \mc{\underline{0.9822}} \\
+		\hline
+		\hline
+
+		\multirow{2}{*}{\hspace{5pt}Corr.}           & \mc{MPSNR} & \mc{28.85}  & \mc{42.73}  & \mc{42.13}  & \mc{47.05}  & \mc{45.76}  & \mc{38.06}              & \mc{45.98}  & \mc{\underline{48.90}}  & \mc{\textbf{49.89}}     & \mc{48.78}              \\
+		                                             & \mc{MSSIM} & \mc{0.4740} & \mc{0.9599} & \mc{0.9070} & \mc{0.9881} & \mc{0.9824} & \mc{0.8536}             & \mc{0.9835} & \mc{\underline{0.9911}} & \mc{\textbf{0.9923}}    & \mc{\underline{0.9911}} \\
+		\hline
+		\hline
+
+		\multirow{2}{*}{\hspace{5pt}Strip.}          & \mc{MPSNR} & \mc{21.20}  & \mc{34.88}  & \mc{37.70}  & \mc{42.06}  & \mc{39.38}  & \mc{39.78}              & \mc{41.98}  & \mc{\underline{44.60}}  & \mc{\textbf{44.74}}     & \mc{43.80}              \\
+		                                             & \mc{MSSIM} & \mc{0.1508} & \mc{0.8641} & \mc{0.9198} & \mc{0.9628} & \mc{0.9258} & \mc{0.9333}             & \mc{0.9655} & \mc{\textbf{0.9806}}    & \mc{\underline{0.9805}} & \mc{0.9773}             \\
+		\bottomrule
+	\end{tabular}
+}
+\end{document}

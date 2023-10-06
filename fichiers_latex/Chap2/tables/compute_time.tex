@@ -1,0 +1,48 @@
+% \begin{tabular}{c | c c c c c c c}
+%   \toprule
+%   & FCLSU & Endnet & MiSiCNet & NMF-QMV & AA & RAA & EDAA \\
+%   \hline
+%   Samson & \textbf{0.3} & 560.0 & 80.0 & 20.1 & 17.6 & 16.4 & \underline{11.2} \\
+%   JasperRidge & \textbf{0.4} & 680.0 & 90.0 & 22.3 & 21.9 & 21.1 & \underline{9.6} \\
+%   Urban4 & \textbf{3.6} & 720.0 & 411.0 & 112.5 & 237.6 & 228.4 & \underline{66.3} \\
+%   Urban6 & \textbf{4.4} & 1000.0 & 417.0 & 158.4 & 343.0 & 327.9 & \underline{75.2} \\
+%   APEX & \textbf{0.6} & 720.0 & 92.0 & 27.2 & 44.8 & 31.0 & \underline{15.4} \\
+%   WDC & \textbf{4.0} & 1000.0 & 409.0 & 174.4 & 361.8 & 324.7 & \underline{81.0} \\
+%   \bottomrule
+% \end{tabular}
+
+% Remove RAA
+
+
+%\begin{tabular}{c | c c c c c c}
+%  \toprule
+%  & FCLSU & Endnet & MiSiCNet & NMF-QMV & AA & EDAA \\
+%  \hline
+%  Samson & \textbf{0.3} & $\approx$ 560 & $\approx$ 80 & 20.1 & 17.6 & \underline{11.2} \\
+%  JasperRidge & \textbf{0.4} & $\approx$ 680 & $\approx$ 90 & 22.3 & 21.9 & \underline{9.6} \\
+%  Urban4 & \textbf{3.6} & $\approx$ 720 & $\approx$ 411 & 112.5 & 237.6 & \underline{66.3} \\
+%  Urban6 & \textbf{4.4} & $\approx$ 1000 & $\approx$ 417 & 158.4 & 343.0 & \underline{75.2} \\
+%  APEX & \textbf{0.6} & $\approx$ 720 & $\approx$ 92 & 27.2 & 44.8 & \underline{15.4} \\
+%  WDC & \textbf{4.0} & $\approx$ 1000 & $\approx$ 409 & 174.4 & 361.8 & \underline{81.0} \\
+%  \bottomrule
+%\end{tabular}
+
+% Recompute AA with T=100
+
+\begin{tabular}{c | c c c c c c c c | c c}
+  \toprule
+  & FCLS & Endnet & MiSiCNet & \rev{ADMMNet} & \rev{MVCNMF} & NMF-QMV & \rev{SeCoDe} & \rev{NCAA} & \revision{AA ($T=100$)} & EDAA \\
+  \hline
+  Samson & \textbf{0.3} & $\approx$ 560 & $\approx$ 80 & 55.2 & \underline{3.8} & 20.1 & 24.2 & 113.1 & \revision{33.0} & 11.2 \\
+  JasperRidge & \textbf{0.4} & $\approx$ 680 & $\approx$ 90 & 54.1 & \underline{8.0} & 22.3 & 28.6 & 501.4 & \revision{43.6} & 9.6 \\
+  Urban4 & \textbf{3.6} & $\approx$ 720 & $\approx$ 411 & 504.6 & \underline{25.4} & 112.5 & 475.1 & 3529.9 & \revision{415.7} & 66.3 \\
+  Urban6 & \textbf{4.4} & $\approx$ 1000 & $\approx$ 417 & 507.5 & \underline{45.0} & 158.4 & 707.7 & 4880.8 & \revision{593.7} & 75.2 \\
+  APEX & \textbf{0.6} & $\approx$ 720 & $\approx$ 92 & 80.0 & \underline{11.3} & 27.2 & 56.1 & 441.5 & \revision{75.4} & 15.4 \\
+  WDC & \textbf{4.0} & $\approx$ 1000 & $\approx$ 409 & 535.8 & \underline{55.1} & 174.4 & 524.7 & 4179.0 & \revision{493.1} & 81.0 \\
+  \bottomrule
+\end{tabular}
+
+
+
+
+

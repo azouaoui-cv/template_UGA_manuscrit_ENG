@@ -1,0 +1,450 @@
+% \begin{tabular}{c | c | c c c c c c c} 
+%   \toprule
+%   & & FCLSU & NMF-QMV & AA & RAA & CNNAEU & MiSiCNet & EDAA \\
+%   \hline
+%   \multirow{4}{*}{Samson}
+%   & Soil & 2.76 & 4.90 & 0.78 & \textbf{0.54} & 4.78 & 0.59 & 1.76\\
+%   & Tree & 3.05 & 5.34 & 1.80 & \textbf{1.65} & 2.48  & 2.03 & 1.99\\
+%   & Water & 7.15 & 11.14 & 1.38 & \textbf{1.31} & 12.33 & 22.96 & 1.38\\
+%   \cline{2-9}
+%   & Overall & 4.32 & 7.13 & 1.32 & \textbf{1.17} & 6.53 & 8.52 & 1.71\\
+%   \hline
+%   \hline
+%   \multirow{5}{*}{Jasper Ridge}
+%   & Dirt & 13.03 & 12.40 & \textbf{2.44} & 4.13 & 5.74 & 3.79 & 2.99 \\
+%   & Road & 40.39 & 45.66 & 8.00 & \textbf{1.77} & 14.34 & 18.88 & 2.63 \\
+%   & Tree & 11.16 & 14.46 & 4.34 & 4.01 & 5.48 & \textbf{2.49} & 4.59 \\
+%   & Water & 13.24 & 14.53 & 3.29 & \textbf{1.79} & 4.66 & 16.58 & 2.72 \\
+%   \cline{2-9}
+%   & Overall & 19.46 & 21.77 & 4.52 & \textbf{2.92} & 7.55 & 10.44 & 3.23 \\
+%   \hline
+%   \hline
+%   \multirow{5}{*}{Urban4}
+%   & Road & 15.40 & 14.51 & 3.73 & 4.41 & \textbf{3.30} & 43.54 & 3.61 \\
+%   & Grass & 24.18 & 16.39 & \textbf{1.81} & 1.96 & 2.50 & 22.39 & 5.88 \\
+%   & Roof & 47.56 & 36.31 & 15.59 & 6.25 & \textbf{2.20} & 2.59 & 17.09 \\
+%   & Tree & 19.82 & 22.48 & 3.51 & 2.59 & 2.30 & 5.67 & \textbf{1.92} \\
+%   \cline{2-9}
+%   & Overall & 26.74 & 22.42 & 6.16 & 3.80 & \textbf{2.57} & 18.55 & 7.13 \\
+%   \hline
+%   \hline
+%   \multirow{7}{*}{Urban6}
+%   & Road & 13.43 & 26.60 & 6.74 & 3.78 & \textbf{3.17} & 12.08 & 4.52 \\
+%   & Grass & 22.30 & 21.63 & 6.82 & \textbf{2.42} & 5.31 & 16.47 & 5.75 \\
+%   & Roof & 15.65 & 15.55 & 18.07 & 2.93 & \textbf{2.20} & 3.82 & 18.33 \\
+%   & Tree & 20.70 & 23.31 & 7.18 & \textbf{6.26} & 8.06 & 7.04 & 8.06 \\
+%   & Dirt & 69.81 & 23.60 & 11.08 & 15.71 & 11.21 & \textbf{1.58} & 10.15 \\
+%   & Metal & 39.35 & 68.73 & 40.97 & 44.71 & 18.58 & 35.84 & \textbf{5.02}\\
+%   \cline{2-9}
+%   & Overall & 30.21 & 29.90 & 15.14 & 12.63 & \textbf{8.09} & 12.80 & 8.64 \\
+%   \hline
+%   \hline
+%   \multirow{5}{*}{APEX}
+%   & Road & 40.23 & 54.53 & 37.32 & 35.87 & 18.42 & 14.91 & \textbf{11.54} \\
+%   & Tree & 14.13 & 16.06 & 2.39 & \textbf{2.06} & 14.29 & 7.88 & 7.65 \\
+%   & Roof & 8.25 & \textbf{7.98} & 10.20 & 11.66 & 28.29 & 10.09 & 8.20 \\
+%   & Water & 7.15 & 9.71 & 2.95 & 2.46 & 35.40 & 43.84 & \textbf{2.02} \\
+%   \cline{2-9}
+%   & Overall & 17.44 & 22.07 & 13.21 & 13.01 & 24.10 & 19.18 & \textbf{7.35} \\
+%   \hline
+%   \hline
+%   \multirow{7}{*}{WDC}
+%   & Grass & 17.40 & 34.36 & 4.59 & \textbf{3.64} & 12.43 & 16.36 & 4.90\\
+%   & Tree & 23.73 & 17.70 & 10.93 & 6.63 & 8.51 & 8.66 & \textbf{2.90} \\
+%   & Road & 32.56 & 17.28 & 46.73 & 46.2 & 12.28 & \textbf{5.03} & 6.41\\
+%   & Roof & 34.84 & 44.87 & 43.26 & 47.69 & \textbf{17.86} & 39.43 & 50.79\\
+%   & Water & 4.78 & 19.74 & 1.23 & 1.48 & 3.30 & 2.53 & \textbf{1.14}\\
+%   & Trail & 9.94 & 9.60 & 5.32 & 4.77 & 17.10 & 5.29 & \textbf{3.79}\\
+%   \cline{2-9}
+%   & Overall & 20.54 & 23.93 & 18.68 & 18.40 & 11.91 & 12.89 & \textbf{11.66}\\
+%   \bottomrule
+% \end{tabular}
+% \begin{tabular}{c | c | c c c c c c c} 
+%   \toprule
+%   & & FCLSU & CNNAEU & MiSiCNet & NMF-QMV & AA & RAA  & EDAA \\
+%   \hline
+%   \multirow{4}{*}{Samson}
+%   & Soil & 2.76 & 4.78 & 0.59 & 4.90 & 0.78 & \textbf{0.54} & 1.76\\
+%   & Tree & 3.05 & 2.48  & 2.03 & 5.34 & 1.80 & \textbf{1.65} & 1.99\\
+%   & Water & 7.15 & 12.33 & 22.96 & 11.14 & 1.38 & \textbf{1.31} & 1.38\\
+%   \cline{2-9}
+%   & Overall & 4.32 & 6.53 & 8.52 & 7.13 & 1.32 & \textbf{1.17} & 1.71\\
+%   \hline
+%   \hline
+%   \multirow{5}{*}{Jasper Ridge}
+%   & Dirt & 13.03 & 5.74 & 3.79 & 12.40 & \textbf{2.44} & 4.13 & 2.99 \\
+%   & Road & 40.39 & 14.34 & 18.88 & 45.66 & 8.00 & \textbf{1.77} & 2.63 \\
+%   & Tree & 11.16 & 5.48 & \textbf{2.49} & 14.46 & 4.34 & 4.01 & 4.59 \\
+%   & Water & 13.24 & 4.66 & 16.58 & 14.53 & 3.29 & \textbf{1.79} & 2.72 \\
+%   \cline{2-9}
+%   & Overall & 19.46 & 7.55 & 10.44 & 21.77 & 4.52 & \textbf{2.92} & 3.23 \\
+%   \hline
+%   \hline
+%   \multirow{5}{*}{Urban4}
+%   & Road & 15.40 & \textbf{3.30} & 43.54 & 14.51 & 3.73 & 4.41 & 3.61 \\
+%   & Grass & 24.18 & 2.50 & 22.39 & 16.39 & \textbf{1.81} & 1.96 & 5.88 \\
+%   & Roof & 47.56 & \textbf{2.20} & 2.59 & 36.31 & 15.59 & 6.25 & 17.09 \\
+%   & Tree & 19.82 & 2.30 & 5.67 & 22.48 & 3.51 & 2.59 & \textbf{1.92} \\
+%   \cline{2-9}
+%   & Overall & 26.74 & \textbf{2.57} & 18.55 & 22.42 & 6.16 & 3.80 & 7.13 \\
+%   \hline
+%   \hline
+%   \multirow{7}{*}{Urban6}
+%   & Road & 13.43 & \textbf{3.17} & 12.08 & 26.60 & 6.74 & 3.78 & 4.52 \\
+%   & Grass & 22.30 & 5.31 & 16.47 & 21.63 & 6.82 & \textbf{2.42} & 5.75 \\
+%   & Roof & 15.65 & \textbf{2.20} & 3.82 & 15.55 & 18.07 & 2.93 & 18.33 \\
+%   & Tree & 20.70 & 8.06 & 7.04 & 23.31 & 7.18 & \textbf{6.26} & 8.06 \\
+%   & Dirt & 69.81 & 11.21 & \textbf{1.58} & 23.60 & 11.08 & 15.71 & 10.15 \\
+%   & Metal & 39.35 & 18.58 & 35.84 & 68.73 & 40.97 & 44.71 & \textbf{5.02}\\
+%   \cline{2-9}
+%   & Overall & 30.21 & \textbf{8.09} & 12.80 & 29.90 & 15.14 & 12.63 & 8.64 \\
+%   \hline
+%   \hline
+%   \multirow{5}{*}{APEX}
+%   & Road & 40.23 & 18.42 & 14.91 & 54.53 & 37.32 & 35.87 & \textbf{11.54} \\
+%   & Tree & 14.13 & 14.29 & 7.88 & 16.06 & 2.39 & \textbf{2.06} & 7.65 \\
+%   & Roof & 8.25 & 28.29 & 10.09 & \textbf{7.98} & 10.20 & 11.66 & 8.20 \\
+%   & Water & 7.15 & 35.40 & 43.84 & 9.71 & 2.95 & 2.46 & \textbf{2.02} \\
+%   \cline{2-9}
+%   & Overall & 17.44 & 24.10 & 19.18 & 22.07 & 13.21 & 13.01 & \textbf{7.35} \\
+%   \hline
+%   \hline
+%   \multirow{7}{*}{WDC}
+%   & Grass & 17.40 & 12.43 & 16.36 & 34.36 & 4.59 & \textbf{3.64} & 4.90\\
+%   & Tree & 23.73 & 8.51 & 8.66 & 17.70 & 10.93 & 6.63 & \textbf{2.90} \\
+%   & Road & 32.56 & 12.28 & \textbf{5.03} & 17.28 & 46.73 & 46.2 & 6.41\\
+%   & Roof & 34.84 & \textbf{17.86} & 39.43 & 44.87 & 43.26 & 47.69 & 50.79\\
+%   & Water & 4.78 & 3.30 & 2.53 & 19.74 & 1.23 & 1.48 & \textbf{1.14}\\
+%   & Trail & 9.94 & 17.10 & 5.29 & 9.60 & 5.32 & 4.77 & \textbf{3.79}\\
+%   \cline{2-9}
+%   & Overall & 20.54 & 11.91 & 12.89 & 23.93 & 18.68 & 18.40 & \textbf{11.66}\\
+%   \bottomrule
+% \end{tabular}
+
+% \begin{tabular}{c | c | c c c c c c c} 
+%   \toprule
+%   & & FCLSU \cite{nascimento_vertex_2005, heinz_fully_2001} & CNNAEU \cite{palsson_convolutional_2021} & MiSiCNet \cite{rasti_misicnet_2022} & NMF-QMV \cite{zhuang_regularization_2019} & AA & RAA & EDAA \\
+%   \hline
+%   \multirow{4}{*}{Samson}
+%   & Soil & 2.76 & 3.10 & 1.21 & 4.90 & \underline{0.78} & \textbf{0.54} & 1.76\\
+%   & Tree & 3.05 & 2.40  & 3.38 & 5.34 & \underline{1.80} & \textbf{1.65} & 1.99\\
+%   & Water & 7.15 & 9.10 & 5.36 & 11.14 & \underline{1.38} & \textbf{1.31} & \underline{1.38}\\
+%   \cline{2-9}
+%   & Overall & 4.32 & 4.87 & 3.32 & 7.13 & \underline{1.32} & \textbf{1.17} & 1.71\\
+%   \hline
+%   \hline
+%   \multirow{5}{*}{Jasper Ridge}
+%   & Dirt & 13.03 & 5.29 & 4.26 & 12.40 & \textbf{2.44} & 4.13 & \underline{2.99} \\
+%   & Road & 40.39 & 19.92 & 20.04 & 45.66 & 8.00 & \textbf{1.77} & \underline{2.63} \\
+%   & Tree & 11.16 & 5.53 & \textbf{1.27} & 14.46 & 4.34 & \underline{4.01} & 4.59 \\
+%   & Water & 13.24 & \underline{2.44} & 4.18 & 14.53 & 3.29 & \textbf{1.79} & 2.72 \\
+%   \cline{2-9}
+%   & Overall & 19.46 & 8.30 & 7.44 & 21.77 & 4.52 & \textbf{2.92} & \underline{3.23} \\
+%   \hline
+%   \hline
+%   \multirow{5}{*}{Urban4}
+%   & Road & 15.40 & \textbf{3.31} & 5.73 & 14.51 & 3.73 & 4.41 & \underline{3.61} \\
+%   & Grass & 24.18 & 2.70 & 5.84 & 16.39 & \textbf{1.81} & \underline{1.96} & 5.88 \\
+%   & Roof & 47.56 & \textbf{2.56} & 16.10 & 36.31 & 15.59 & \underline{6.25} & 17.09 \\
+%   & Tree & 19.82 & 2.67 & 4.60 & 22.48 & 3.51 & \underline{2.59} & \textbf{1.92} \\
+%   \cline{2-9}
+%   & Overall & 26.74 & \textbf{2.81} & 8.07 & 22.42 & 6.16 & \underline{3.80} & 7.13 \\
+%   \hline
+%   \hline
+%   \multirow{7}{*}{Urban6}
+%   & Road & 13.43 & 5.60 & 7.47 & 26.60 & 6.74 & \textbf{3.78} & \underline{4.52} \\
+%   & Grass & 22.30 & \underline{3.28} & 10.97 & 21.63 & 6.82 & \textbf{2.42} & 5.75 \\
+%   & Roof & 15.65 & \textbf{2.38} & 13.97 & 15.55 & 18.07 & \underline{2.93} & 18.33 \\
+%   & Tree & 20.70 & 8.65 & 9.99 & 23.31 & \underline{7.18} & \textbf{6.26} & 8.06 \\
+%   & Dirt & 69.81 & 17.88 & 19.57 & 23.60 & \underline{11.08} & 15.71 & \textbf{10.15} \\
+%   & Metal & 39.35 & \underline{9.65} & 9.75 & 68.73 & 40.97 & 44.71 & \textbf{5.02}\\
+%   \cline{2-9}
+%   & Overall & 30.21 & \textbf{7.91} & 11.95 & 29.90 & 15.14 & 12.63 & \underline{8.64} \\
+%   \hline
+%   \hline
+%   \multirow{5}{*}{APEX}
+%   & Road & 40.23 & \underline{18.51} & 33.02 & 54.53 & 37.32 & 35.87 & \textbf{11.54} \\
+%   & Tree & 14.13 & 14.86 & 3.16 & 16.06 & \underline{2.39} & \textbf{2.06} & 7.65 \\
+%   & Roof & 8.25 & 28.81 & 11.31 & \textbf{7.98} & 10.20 & 11.66 & \underline{8.20} \\
+%   & Water & 7.15 & 36.95 & 6.02 & 9.71 & 2.95 & \underline{2.46} & \textbf{2.02} \\
+%   \cline{2-9}
+%   & Overall & 17.44 & 24.78 & 13.38 & 22.07 & 13.21 & \underline{13.01} & \textbf{7.35} \\
+%   \hline
+%   \hline
+%   \multirow{7}{*}{WDC}
+%   & Grass & 17.40 & 13.14 & 17.46 & 34.36 & \underline{4.59} & \textbf{3.64} & 4.90\\
+%   & Tree & 23.73 & 9.65 & 12.36 & 17.70 & 10.93 & \underline{6.63} & \textbf{2.90} \\
+%   & Road & 32.56 & 16.96 & 33.20 & 17.28 & 46.73 & 46.2 & \underline{6.41}\\
+%   % & Grass & 17.40 & 12.43 & 16.36 & 34.36 & 4.59 & \textbf{3.64} & 4.90\\
+%   % & Tree & 23.73 & 8.51 & 8.66 & 17.70 & 10.93 & 6.63 & \textbf{2.90} \\
+%   % & Road & 32.56 & 12.28 & \textbf{5.03} & 17.28 & 46.73 & 46.2 & 6.41\\
+%   & Roof & 34.84 & \textbf{17.34} & \underline{28.87} & 44.87 & 43.26 & 47.69 & 50.79\\
+%   & Water & 4.78 & 3.11 & 1.57 & 19.74 & \underline{1.23} & 1.48 & \textbf{1.14}\\
+%   & Trail & 9.94 & 13.99 & \textbf{3.24} & 9.60 & 5.32 & 4.77 & \underline{3.79}\\
+%   \cline{2-9}
+%   & Overall & 20.54 & \underline{12.36} & 16.11 & 23.93 & 18.68 & 18.40 & \textbf{11.66}\\
+%   \bottomrule
+% \end{tabular}
+
+% \begin{tabular}{c | c | c c c c c c c} 
+%   \toprule
+%   & & FCLSU \cite{nascimento_vertex_2005, heinz_fully_2001} & Endnet \cite{ozkan_endnet_2018} & MiSiCNet \cite{rasti_misicnet_2022} & NMF-QMV \cite{zhuang_regularization_2019} & AA & RAA & EDAA \\
+%   \hline
+%   \multirow{4}{*}{Samson}
+%   & Soil & 2.76 & \underline{0.61} & 1.21 & 4.90 & 0.78 & \textbf{0.54} & 1.64\\
+%   & Tree & 3.05 &  1.93 & 3.38 & 5.34 & \underline{1.80} & \textbf{1.65} & 1.98\\
+%   & Water & 7.15 & 1.48 & 5.36 & 11.14 & 1.38 & \textbf{1.31} & \textbf{1.31}\\
+%   \cline{2-9}
+%   & Overall & 4.32 & 1.34 & 3.32 & 7.13 & \underline{1.32} & \textbf{1.17} & 1.64\\
+%   \hline
+%   \hline
+%   \multirow{5}{*}{Jasper Ridge}
+%   & Dirt & 13.03 & \textbf{1.63} & 4.26 & 12.40 & \underline{2.44} & 4.13 & 2.74 \\
+%   & Road & 40.39 & 32.85 & 20.04 & 45.66 & 8.00 & \textbf{1.77} & \underline{3.10} \\
+%   & Tree & 11.16 & \underline{1.39} & \textbf{1.27} & 14.46 & 4.34 & 4.01 & 4.23 \\
+%   & Water & 13.24 & 3.21 & 4.18 & 14.53 & 3.29 & \textbf{1.79} & \underline{2.80} \\
+%   \cline{2-9}
+%   & Overall & 19.46 & 9.77 & 7.44 & 21.77 & 4.52 & \textbf{2.92} & \underline{3.22} \\
+%   \hline
+%   \hline
+%   \multirow{5}{*}{Urban4}
+%   & Road & 15.40 & 6.40 & 5.73 & 14.51 & \textbf{3.73} & \underline{4.41} & 6.01 \\
+%   & Grass & 24.18 & 3.09 & 5.84 & 16.39 & \textbf{1.81} & \underline{1.96} & 2.14 \\
+%   & Roof & 47.56 & \textbf{3.76} & 16.10 & 36.31 & 15.59 & \underline{6.25} & 10.49 \\
+%   & Tree & 19.82 & \textbf{2.32} & 4.60 & 22.48 & 3.51 & \underline{2.59} & 2.81 \\
+%   \cline{2-9}
+%   & Overall & 26.74 & \underline{3.89} & 8.07 & 22.42 & 6.16 & \textbf{3.80} & 5.36 \\
+%   \hline
+%   \hline
+%   \multirow{7}{*}{Urban6}
+%   & Road & 13.43 & \textbf{3.26} & 7.47 & 26.60 & 6.74 & \underline{3.78} & 4.85 \\
+%   & Grass & 22.30 & 4.13 & 10.97 & 21.63 & 6.82 & \underline{2.42} & \textbf{2.17} \\
+%   & Roof & 15.65 & 17.76 & 13.97 & 15.55 & 18.07 & \textbf{2.93} & \underline{13.70} \\
+%   & Tree & 20.70 & 7.72 & 9.99 & 23.31 & \underline{7.18} & \textbf{6.26} & 8.92 \\
+%   & Dirt & 69.81 & 17.42 & 19.57 & 23.60 & \textbf{11.08} & 15.71 & \underline{13.33} \\
+%   & Metal & 39.35 & \underline{7.04} & 9.75 & 68.73 & 40.97 & 44.71 & \textbf{4.52}\\
+%   \cline{2-9}
+%   & Overall & 30.21 & \underline{9.56} & 11.95 & 29.90 & 15.14 & 12.63 & \textbf{8.64} \\
+%   \hline
+%   \hline
+%   \multirow{5}{*}{APEX}
+%   & Road & 40.23 & \underline{14.46} & 33.02 & 54.53 & 37.32 & 35.87 & \textbf{6.83} \\
+%   & Tree & 14.13 & 7.53 & 3.16 & 16.06 & \underline{2.39} & \textbf{2.06} & 7.68 \\
+%   & Roof & 8.25 & \textbf{4.36} & 11.31 & 7.98 & 10.20 & 11.66 & \underline{7.50} \\
+%   & Water & 7.15 & 2.83 & 6.02 & 9.71 & 2.95 & \underline{2.46} & \textbf{2.21} \\
+%   \cline{2-9}
+%   & Overall & 17.44 & \underline{7.30} & 13.38 & 22.07 & 13.21 & 13.01 & \textbf{6.06} \\
+%   \hline
+%   \hline
+%   \multirow{7}{*}{WDC}
+%   & Grass & 17.40 & \textbf{3.54} & 17.46 & 34.36 & 4.59 & \underline{3.64} & 8.11\\
+%   & Tree & 23.73 & 12.85 & 12.36 & 17.70 & 10.93 & \underline{6.63} & \textbf{1.81} \\
+%   & Road & 32.56 & 26.76 & 33.20 & \underline{17.28} & 46.73 & 46.2 & \textbf{7.67}\\
+%   % & Grass & 17.40 & 12.43 & 16.36 & 34.36 & 4.59 & \textbf{3.64} & 4.90\\
+%   % & Tree & 23.73 & 8.51 & 8.66 & 17.70 & 10.93 & 6.63 & \textbf{2.90} \\
+%   % & Road & 32.56 & 12.28 & \textbf{5.03} & 17.28 & 46.73 & 46.2 & 6.41\\
+%   & Roof & 34.84 & \textbf{13.70} & \underline{28.87} & 44.87 & 43.26 & 47.69 & 50.97\\
+%   & Water & 4.78 & 1.75 & 1.57 & 19.74 & \underline{1.23} & 1.48 & \textbf{1.08}\\
+%   & Trail & 9.94 & \textbf{1.49} & \underline{3.24} & 9.60 & 5.32 & 4.77 & 4.75\\
+%   \cline{2-9}
+%   & Overall & 20.54 & \textbf{10.02} & 16.11 & 23.93 & 18.68 & 18.40 & \underline{12.40}\\
+%   \bottomrule
+% \end{tabular}
+
+% Remove RAA
+
+%\begin{tabular}{c | c | c c c c | c c} 
+%  \toprule
+%  & & FCLSU \cite{nascimento_vertex_2005, heinz_fully_2001} & Endnet \cite{ozkan_endnet_2018} & MiSiCNet \cite{rasti_misicnet_2022} & NMF-QMV \cite{zhuang_regularization_2019} & AA & EDAA \\
+%  \hline
+%  \multirow{4}{*}{Samson}
+%  & Soil & 2.76 & \textbf{0.61} & 1.21 & 4.90 & \underline{0.78} & 1.64\\
+%  & Tree & 3.05 &  \underline{1.93} & 3.38 & 5.34 & \textbf{1.80} & 1.98\\
+%  & Water & 7.15 & 1.48 & 5.36 & 11.14 & \underline{1.38} & \textbf{1.31}\\
+%  \cline{2-8}
+%  & Overall & 4.32 & \underline{1.34} & 3.32 & 7.13 & \textbf{1.32} & 1.64\\
+%  \hline
+%  \hline
+%  \multirow{5}{*}{Jasper Ridge}
+%  & Dirt & 13.03 & \textbf{1.63} & 4.26 & 12.40 & \underline{2.44} & 2.74 \\
+%  & Road & 40.39 & 32.85 & 20.04 & 45.66 & \underline{8.00} & \textbf{3.10} \\
+%  & Tree & 11.16 & \underline{1.39} & \textbf{1.27} & 14.46 & 4.34 & 4.23 \\
+%  & Water & 13.24 & \underline{3.21} & 4.18 & 14.53 & 3.29 & \textbf{2.80} \\
+%  \cline{2-8}
+%  & Overall & 19.46 & 9.77 & 7.44 & 21.77 & \underline{4.52} & \textbf{3.22} \\
+%  \hline
+%  \hline
+%  \multirow{5}{*}{Urban4}
+%  & Road & 15.40 & 6.40 & \underline{5.73} & 14.51 & \textbf{3.73} & 6.01 \\
+%  & Grass & 24.18 & 3.09 & 5.84 & 16.39 & \textbf{1.81} & \underline{2.14} \\
+%  & Roof & 47.56 & \textbf{3.76} & 16.10 & 36.31 & 15.59 & \underline{10.49} \\
+%  & Tree & 19.82 & \textbf{2.32} & 4.60 & 22.48 & 3.51 & \underline{2.81} \\
+%  \cline{2-8}
+%  & Overall & 26.74 & \textbf{3.89} & 8.07 & 22.42 & 6.16 & \underline{5.36} \\
+%  \hline
+%  \hline
+%  \multirow{7}{*}{Urban6}
+%  & Road & 13.43 & \textbf{3.26} & 7.47 & 26.60 & 6.74 & \underline{4.85} \\
+%  & Grass & 22.30 & \underline{4.13} & 10.97 & 21.63 & 6.82 & \textbf{2.17} \\
+%  & Roof & 15.65 & 17.76 & \underline{13.97} & 15.55 & 18.07 & \textbf{13.70} \\
+%  & Tree & 20.70 & \underline{7.72} & 9.99 & 23.31 & \textbf{7.18} & 8.92 \\
+%  & Dirt & 69.81 & 17.42 & 19.57 & 23.60 & \textbf{11.08} & \underline{13.33} \\
+%  & Metal & 39.35 & \underline{7.04} & 9.75 & 68.73 & 40.97 & \textbf{4.52}\\
+%  \cline{2-8}
+%  & Overall & 30.21 & \underline{9.56} & 11.95 & 29.90 & 15.14 & \textbf{8.64} \\
+%  \hline
+%  \hline
+%  \multirow{5}{*}{APEX}
+%  & Road & 40.23 & \underline{14.46} & 33.02 & 54.53 & 37.32 & \textbf{6.83} \\
+%  & Tree & 14.13 & 7.53 & \underline{3.16} & 16.06 & \textbf{2.39} & 7.68 \\
+%  & Roof & 8.25 & \textbf{4.36} & 11.31 & 7.98 & 10.20 & \underline{7.50} \\
+%  & Water & 7.15 & \underline{2.83} & 6.02 & 9.71 & 2.95 & \textbf{2.21} \\
+%  \cline{2-8}
+%  & Overall & 17.44 & \underline{7.30} & 13.38 & 22.07 & 13.21 & \textbf{6.06} \\
+%  \hline
+%  \hline
+%  \multirow{7}{*}{WDC}
+%  & Grass & 17.40 & \textbf{3.54} & 17.46 & 34.36 & \underline{4.59} & 8.11\\
+%  & Tree & 23.73 & 12.85 & 12.36 & 17.70 & \underline{10.93} & \textbf{1.81} \\
+%  & Road & 32.56 & 26.76 & 33.20 & \underline{17.28} & 46.73 & \textbf{7.67}\\
+%  % & Grass & 17.40 & 12.43 & 16.36 & 34.36 & 4.59 & \textbf{3.64} & 4.90\\
+%  % & Tree & 23.73 & 8.51 & 8.66 & 17.70 & 10.93 & 6.63 & \textbf{2.90} \\
+%  % & Road & 32.56 & 12.28 & \textbf{5.03} & 17.28 & 46.73 & 46.2 & 6.41\\
+%  & Roof & 34.84 & \textbf{13.70} & \underline{28.87} & 44.87 & 43.26 & 50.97\\
+%  & Water & 4.78 & 1.75 & 1.57 & 19.74 & \underline{1.23} & \textbf{1.08}\\
+%  & Trail & 9.94 & \textbf{1.49} & \underline{3.24} & 9.60 & 5.32 & 4.75\\
+%  \cline{2-8}
+%  & Overall & 20.54 & \textbf{10.02} & 16.11 & 23.93 & 18.68 & \underline{12.40}\\
+%  \bottomrule
+%\end{tabular}
+
+ % Revision 
+
+
+% \begin{tabular}{c | c | c c c c | c c} 
+%  \toprule
+%  & & FCLS \cite{nascimento_vertex_2005, heinz_fully_2001} & Endnet \cite{ozkan_endnet_2018} & MiSiCNet \cite{rasti_misicnet_2022} & NMF-QMV \cite{zhuang_regularization_2019} & \revision{AA ($T = 100$)} & EDAA \\
+%  \hline
+%  \multirow{4}{*}{Samson}
+%  & Soil & 2.76 & \textbf{0.61} & 1.21 & 4.90 & \revision{\underline{0.78}} & 1.64\\
+%  & Tree & 3.05 &  \underline{1.93} & 3.38 & 5.34 & \revision{\textbf{1.80}} & 1.98\\
+%  & Water & 7.15 & 1.48 & 5.36 & 11.14 & \revision{\underline{1.38}} & \textbf{1.31}\\
+%  \cline{2-8}
+%  & Overall & 4.32 & \underline{1.34} & 3.32 & 7.13 & \revision{\textbf{1.32}} & 1.64\\
+%  \hline
+%  \hline
+%  \multirow{5}{*}{Jasper Ridge}
+%  & Dirt & 13.03 & \textbf{1.63} & 4.26 & 12.40 & \revision{\underline{2.54}} & 2.74 \\
+%  & Road & 40.39 & 32.85 & 20.04 & 45.66 & \revision{\underline{5.26}} & \textbf{3.10} \\
+%  & Tree & 11.16 & \underline{1.39} & \textbf{1.27} & 14.46 & \revision{4.68} & 4.23 \\
+%  & Water & 13.24 & 3.21 & 4.18 & 14.53 & \revision{\underline{3.03}} & \textbf{2.80} \\
+%  \cline{2-8}
+%  & Overall & 19.46 & 9.77 & 7.44 & 21.77 & \revision{\underline{3.88}} & \textbf{3.22} \\
+%  \hline
+%  \hline
+%  \multirow{5}{*}{Urban4}
+%  & Road & 15.40 & 6.40 & \underline{5.73} & 14.51 & \revision{\textbf{3.70}} & 6.01 \\
+%  & Grass & 24.18 & 3.09 & 5.84 & 16.39 & \revision{\textbf{1.80}} & \underline{2.14} \\
+%  & Roof & 47.56 & \textbf{3.76} & 16.10 & 36.31 & \revision{15.64} & \underline{10.49} \\
+%  & Tree & 19.82 & \textbf{2.32} & 4.60 & 22.48 & \revision{3.47} & \underline{2.81} \\
+%  \cline{2-8}
+%  & Overall & 26.74 & \textbf{3.89} & 8.07 & 22.42 & \revision{6.15} & \underline{5.36} \\
+%  \hline
+%  \hline
+%  \multirow{7}{*}{Urban6}
+%  & Road & 13.43 & \textbf{3.26} & 7.47 & 26.60 & \revision{\underline{4.26}} & 4.85 \\
+%  & Grass & 22.30 & 4.13 & 10.97 & 21.63 & \revision{\underline{3.44}} & \textbf{2.17} \\
+%  & Roof & 15.65 & 17.76 & \underline{13.97} & 15.55 & \revision{21.18} & \textbf{13.70} \\
+%  & Tree & 20.70 & \textbf{7.72} & 9.99 & 23.31 & \revision{\underline{8.76}} & 8.92 \\
+%  & Dirt & 69.81 & 17.42 & 19.57 & 23.60 & \revision{\textbf{9.87}} & \underline{13.33} \\
+%  & Metal & 39.35 & \underline{7.04} & 9.75 & 68.73 & \revision{7.59} & \textbf{4.52}\\
+%  \cline{2-8}
+%  & Overall & 30.21 & 9.56 & 11.95 & 29.90 & \revision{\underline{9.18}} & \textbf{8.64} \\
+%  \hline
+%  \hline
+%  \multirow{5}{*}{APEX}
+%  & Road & 40.23 & 14.46 & 33.02 & 54.53 & \revision{\textbf{4.80}} & \underline{6.83} \\
+%  & Tree & 14.13 & 7.53 & \textbf{3.16} & 16.06 & \revision{\underline{7.56}} & 7.68 \\
+%  & Roof & 8.25 & \textbf{4.36} & 11.31 & 7.98 & \revision{\underline{7.44}} & 7.50 \\
+%  & Water & 7.15 & 2.83 & 6.02 & 9.71 & \revision{\underline{2.32}} & \textbf{2.21} \\
+%  \cline{2-8}
+%  & Overall & 17.44 & 7.30 & 13.38 & 22.07 & \revision{\textbf{5.53}} & \underline{6.06} \\
+%  \hline
+%  \hline
+%  \multirow{7}{*}{WDC}
+%  & Grass & 17.40 & \textbf{3.54} & 17.46 & 34.36 & \revision{17.10} & \underline{8.11}\\
+%  & Tree & 23.73 & 12.85 & 12.36 & 17.70 & \revision{\underline{8.17}} & \textbf{1.81} \\
+%  & Road & 32.56 & 26.76 & 33.20 & \underline{17.28} & \revision{35.29} & \textbf{7.67}\\
+%  & Roof & 34.84 & \textbf{13.70} & 28.87 & 44.87 & \revision{\underline{16.19}} & 50.97\\
+%  & Water & 4.78 & 1.75 & \underline{1.57} & 19.74 & \revision{3.62} & \textbf{1.08}\\
+%  & Trail & 9.94 & \textbf{1.49} & \underline{3.24} & 9.60 & \revision{4.28} & 4.75\\
+%  \cline{2-8}
+%  & Overall & 20.54 & \textbf{10.02} & 16.11 & 23.93 & \revision{14.11} & \underline{12.40}\\
+%  \bottomrule
+%\end{tabular}
+
+
+%& & FCLS \cite{nascimento_vertex_2005, heinz_fully_2001} & Endnet \cite{ozkan_endnet_2018} & MiSiCNet \cite{rasti_misicnet_2022} & ADMMNet \cite{zhou_admm-based_2021} & MVCNMF \cite{miao_endmember_2007} & NMF-QMV \cite{zhuang_regularization_2019} & SeCoDe \cite{yao_sparsity-enhanced_2021} & NCAA \cite{de_handschutter_near-convex_2019} \revision{AA ($T = 100$)} & EDAA \\
+\resizebox{\textwidth}{!}{
+ \begin{tabular}{c | c | c c c c c c c c | c c} 
+  \toprule
+ & & FCLS & Endnet & MiSiCNet & \rev{ADMMNet} & \rev{MVCNMF} & NMF-QMV  & \rev{SeCoDe}  & \rev{NCAA} & \revision{AA ($T = 100$)} & EDAA \\
+  \hline
+  \multirow{4}{*}{Samson}
+  & Soil & 2.76 & \textbf{0.61} & 1.21 & \rev{7.48} & \rev{1.08} & 4.90 & \rev{0.79} & \rev{4.57} & \revision{\underline{0.78}} & 1.64\\
+  & Tree & 3.05 &  \underline{1.93} & 3.38 & \rev{2.48} & \rev{2.54} & 5.34 & \rev{1.96} & \rev{2.42} & \revision{\textbf{1.80}} & 1.98\\
+  & Water & 7.15 & 1.48 & 5.36 & \rev{6.68} & \rev{4.82} & 11.14 & \rev{2.56} & \rev{5.15} & \revision{\underline{1.38}} & \textbf{1.31}\\
+  \cline{2-12}
+  & Overall & 4.32 & \underline{1.34} & 3.32 & \rev{5.55} & \rev{2.81} & 7.13 & \rev{1.77} & \rev{4.05} & \revision{\textbf{1.32}} & 1.64\\
+  \hline
+  \hline
+  \multirow{5}{*}{Jasper Ridge}
+  & Dirt & 13.03 & \textbf{1.63} & 4.26 & \rev{21.90} & \rev{9.41} & 12.40 & \rev{9.94} & \rev{4.08} & \revision{\underline{2.54}} & 2.74 \\
+  & Road & 40.39 & 32.85 & 20.04 & \rev{46.06} & \rev{36.38} & 45.66 & \rev{45.87} & \rev{41.84} & \revision{\underline{5.26}} & \textbf{3.10} \\
+  & Tree & 11.16 & \underline{1.39} & \textbf{1.27} & \rev{10.78} & \rev{8.28} & 14.46 & \rev{12.42} & \rev{2.25} & \revision{4.68} & 4.23 \\
+  & Water & 13.24 & 3.21 & 4.18 & \rev{13.14} & \rev{10.40} & 14.53 & \rev{6.44} & \rev{5.00} & \revision{\underline{3.03}} & \textbf{2.80} \\
+  \cline{2-12}
+  & Overall & 19.46 & 9.77 & 7.44 & \rev{22.97} & \rev{16.12} & 21.77 & \rev{18.67} & \rev{13.29} & \revision{\underline{3.88}} & \textbf{3.22} \\
+  \hline
+  \hline
+  \multirow{5}{*}{Urban4}
+  & Road & 15.40 & 6.40 & \underline{5.73} & \rev{27.68} & \rev{9.00} & 14.51 & \rev{17.28} & \rev{9.44} & \revision{\textbf{3.70}} & 6.01 \\
+  & Grass & 24.18 & 3.09 & 5.84 & \rev{18.58} & \rev{7.32} & 16.39 & \rev{7.25} & \rev{4.81} & \revision{\textbf{1.80}} & \underline{2.14} \\
+  & Roof & 47.56 & \textbf{3.76} & 16.10 & \rev{33.08} & \rev{27.80} & 36.31 & \rev{30.08} & \rev{23.98} & \revision{15.64} & \underline{10.49} \\
+  & Tree & 19.82 & \underline{2.32} & 4.60 & \rev{11.34} & \rev{6.39} & 22.48 & \rev{16.17} & \rev{\textbf{1.44}} & \revision{3.47} & \underline{2.81} \\
+  \cline{2-12}
+  & Overall & 26.74 & \textbf{3.89} & 8.07 & \rev{22.67} & \rev{12.63} & 22.42 & \rev{17.69} & \rev{9.92} & \revision{6.15} & \underline{5.36} \\
+  \hline
+  \hline
+  \multirow{7}{*}{Urban6}
+  & Road & 13.43 & \textbf{3.26} & 7.47 & \rev{35.54} & \rev{23.96} & 26.60 & \rev{32.28} & \rev{18.95} & \revision{\underline{4.26}} & 4.85 \\
+  & Grass & 22.30 & 4.13 & 10.97 & \rev{29.20} & \rev{12.60} & 21.63 & \rev{13.34} & \rev{7.36} & \revision{\underline{3.44}} & \textbf{2.17} \\
+  & Roof & 15.65 & 17.76 & \underline{13.97} & \rev{41.57} & \rev{28.09} & 15.55 & \rev{42.86} & \rev{27.14} & \revision{21.18} & \textbf{13.70} \\
+  & Tree & 20.70 & \underline{7.72} & 9.99 & \rev{16.67} & \rev{12.93} & 23.31 & \rev{25.85} & \rev{\textbf{5.62}} & \revision{\underline{8.76}} & 8.92 \\
+  & Dirt & 69.81 & 17.42 & 19.57 & \rev{36.46} & \rev{19.59} & 23.60 & \rev{27.66} & \rev{37.21} & \revision{\textbf{9.87}} & \underline{13.33} \\
+  & Metal & 39.35 & 7.04 & 9.75 & \rev{39.91} & \rev{\underline{5.78}} & 68.73 & \rev{57.78} & \rev{11.13} & \revision{7.59} & \textbf{4.52}\\
+  \cline{2-12}
+  & Overall & 30.21 & 9.56 & 11.95 & \rev{29.20} & \rev{17.16} & 29.90 & \rev{33.30} & \rev{17.90} & \revision{\underline{9.18}} & \textbf{8.64} \\
+  \hline
+  \hline
+  \multirow{5}{*}{APEX}
+  & Road & 40.23 & 14.46 & 33.02 & \rev{49.02} & \rev{44.02} & 54.53 & \rev{48.91} & \rev{37.26} & \revision{\textbf{4.80}} & \underline{6.83} \\
+  & Tree & 14.13 & 7.53 & \textbf{3.16} & \rev{17.57} & \rev{7.49} & 16.06 & \rev{16.37} & \rev{\underline{6.50}} & \revision{7.56} & 7.68 \\
+  & Roof & 8.25 & \textbf{4.36} & 11.31 & \rev{11.41} & \rev{5.34} & 7.98 & \rev{8.13} & \rev{\underline{4.41}} & \revision{7.44} & 7.50 \\
+  & Water & 7.15 & 2.83 & 6.02 & \rev{4.01} & \rev{3.16} & 9.71 & \rev{4.06} & \rev{9.06} & \revision{\underline{2.32}} & \textbf{2.21} \\
+  \cline{2-12}
+  & Overall & 17.44 & 7.30 & 13.38 & \rev{20.50} & \rev{15.00} & 22.07 & \rev{19.37} & \rev{14.31} & \revision{\textbf{5.53}} & \underline{6.06} \\
+  \hline
+  \hline
+  \multirow{7}{*}{WDC}
+  & Grass & 17.40 & \textbf{3.54} & 17.46 & \rev{43.51} & \rev{11.01} & 34.36 & \rev{25.43} & \rev{15.33} & \revision{17.10} & \underline{8.11}\\
+  & Tree & 23.73 & 12.85 & 12.36 & \rev{23.58} & \rev{20.73} & 17.70 & \rev{50.57} & \rev{25.36} & \revision{\underline{8.17}} & \textbf{1.81} \\
+  & Road & 32.56 & 26.76 & 33.20 & \rev{39.15} & \rev{16.95} & 17.28 & \rev{21.96} & \rev{\underline{16.06}} & \revision{35.29} & \textbf{7.67}\\
+  & Roof & 34.84 & \underline{13.70} & 28.87 & \rev{31.47} & \rev{\textbf{4.77}} & 44.87 & \rev{46.46} & \rev{33.94} & \revision{16.19} & 50.97\\
+  & Water & 4.78 & 1.75 & \underline{1.57} & \rev{11.60} & \rev{5.43} & 19.74 & \rev{30.22} & \rev{4.64} & \revision{3.62} & \textbf{1.08}\\
+  & Trail & 9.94 & \textbf{1.49} & \underline{3.24} & \rev{24.85} & \rev{13.57} & 9.60 & \rev{28.89} & \rev{11.41} & \revision{4.28} & 4.75\\
+  \cline{2-12}
+  & Overall & 20.54 & \textbf{10.02} & 16.11 & \rev{29.03} & \rev{\underline{12.08}} & 23.93 & \rev{33.92} & \rev{17.79} & \revision{14.11} & 12.40\\
+  \bottomrule
+\end{tabular}
+}

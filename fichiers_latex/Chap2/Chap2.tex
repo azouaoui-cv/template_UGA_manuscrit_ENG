@@ -20,43 +20,840 @@
 %%%%%                      Start part here                          %%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\chapter{Title 2}
-\label{ch:2}
+\chapter{Entropic Descent Archetypal Analysis for Blind Hyperspectral Unmixing}
+\label{ch:EDAA}
 
 %==============================================================================	Résumé du chapitre
 
-\begin{center}
-\rule{0.7\linewidth}{.5pt}
-\begin{minipage}{0.7\linewidth}
-\smallskip
+\begin{tcolorbox}[colback=gray!5!white,colframe=gray!75!black]
 
-\textit{Summary of the chapter possible here.
+        \paragraph{Chapter abstract:}
+        In this chapter, we introduce a new algorithm based on archetypal analysis for blind hyperspectral unmixing, assuming linear mixing of endmembers.
+        Archetypal analysis is a natural formulation for this task.
+        This method does not require the presence of pure pixels (i.e., pixels containing a single material) but instead represents endmembers as convex combinations of a few pixels present in the original hyperspectral image.
+        Our approach leverages an entropic gradient descent strategy, which (i) provides better solutions for hyperspectral unmixing than traditional archetypal analysis algorithms, and (ii) leads to efficient GPU implementations.
+        Since running a single instance of our algorithm is fast, we also propose an ensembling mechanism along with an appropriate model selection procedure that make our method robust to hyper-parameter choices while keeping the computational complexity reasonable.
+        By using six standard real datasets, we show that our approach outperforms state-of-the-art matrix factorization and recent deep learning methods.
+
+        \vspace{1em}
+        The source code is freely available at \href{https://github.com/inria-thoth/EDAA}{https://github.com/inria-thoth/EDAA}.
+        
+        \vspace{1em}
+        The chapter is based on the following publication:
+
+        \vspace{0.5em}
+
+        A. Zouaoui, G. Muhawenayo, B. Rasti, J. Chanussot, and J. Mairal. Entropic descent archetypal analysis for blind hyperspectral unmixing. In \emph{IEEE Transactions on Image Processing}, 2023
+    \end{tcolorbox}
+
+\newpage
+\minitoc
+
+\section{Introduction}
+
+Hyperspectral (HS) imaging  \cite{landgrebe_hyperspectral_2002, plaza_recent_2009, schaepman_earth_2009, goetz_imaging_1985, green_imaging_1998} consists of measuring the electromagnetic spectrum in a scene by using multiple narrow spectral bands.
+Thanks to its richer spectral information compared to traditional RGB images, HS images enable more accurate materials identification, leading to a broad range of applications including crop monitoring in agriculture \cite{adao_hyperspectral_2017}, waste sorting \cite{karaca_automatic_2013}, food safety inspection \cite{gowen_hyperspectral_2007}, or mineralogy~\cite{fox_applications_2017}.
+
+Remote sensing \cite{clark_imaging_2003, bioucas-dias_hyperspectral_2013}, such as airborne or satellite imagery, yields HS images whose pixels capture several objects or materials.
+As such, each pixel can include several pure spectral components (called \emph{endmembers}), mixed in different proportions \cite{ghamisi_advances_2017}.
+Any further analysis hence requires identifying and disentangling endmembers present in a scene before estimating their respective proportions, or fractional \emph{abundances}, within each pixel of the HSI \cite{parra_unmixing_1999}.
+Since the endmembers spectrum signatures are not known beforehand and must be estimated from data, this operation is named \emph{blind} HS unmixing \cite{keshava_spectral_2002, bioucas-dias_hyperspectral_2012} owing to its link with blind source separation \cite{comon_handbook_2010}.
+
+In this chapter, we adopt a linear mixing model since it is often relevant in remote sensing scenes where mixtures occur between macroscopic materials.
+Therefore, we assume that each observed pixel can be represented as a linear combination of endmembers and some additive noise.
+In other words, we are interested in tackling unsupervised linear HS unmixing \cite{parra_unmixing_1999}.
+
+Further assumptions on the nature of endmembers are generally needed to estimate meaningful spectra.
+For instance, it can be assumed that there exists at least one pure pixel for each material present in the scene.
+The problem then requires finding these pure pixels within the original image.
+The pure pixel assumption is at the core of several geometrical endmember extraction methods including pixel purity index (PPI) \cite{boardman_mapping_1995}, N-FINDR \cite{winter_n-findr_1999} and vertex component analysis (VCA) \cite{nascimento_vertex_2005}.
+Once endmembers have been extracted, abundances can be estimated by minimizing the least squares errors between the original input spectra and the linearly reconstructed spectra as long as the abundances fractions satisfy the two physical constraints stating that they should be non-negative and sum to one for each pixel \cite{heinz_fully_2001}. 
+That being said, pure pixels are often missing in real scenarios.
+In the absence of pure pixels and in the case of linear models, endmembers and abundances can be simultaneously estimated by solving a constrained or penalized non-negative matrix factorization problem (NMF) \cite{lee_algorithms_2000}.
+For example, the authors of \cite{zhuang_regularization_2019} have proposed a formulation that involves a data fidelity term and a minimum volume regularization term on endmembers, whose minimization consists in alternating between solving for endmembers and abundances.
+
+In this work, we do not assume the existence of pure pixels as they are often missing in real data, since, for instance, the spectral signatures of endmembers in HS images can be significantly affected by various changes in atmospheric, illumination, and environmental conditions within the scene~\cite{borsoi_spectral_2021}. 
+\rev{There are multiple strategies that can be employed to tackle spectral variability such as (i) augmenting the linear mixing model~\cite{hong_augmented_2018}, (ii) using a tensor-based approach, like the Sparsity-Enhanced Convolutional Decomposition (SeCoDe) method~\cite{yao_sparsity-enhanced_2021}, (iii) performing unmixing in orthogonal subspaces as in~\cite{ren_orthogonal_2023}.}
+Instead, we mitigate the effect of spectral variability by (i) normalizing each pixel by the $\ell_2$-norm of its spectrum as a pre-processing step and (ii) modeling endmembers as convex combinations of pixels present in the scene.
+Not only HS pixels are linear combinations of the estimated endmembers under the linear mixing model, but the estimated endmembers are also convex combinations of pixels. 
+This corresponds to the archetypal analysis (AA) formulation introduced by Cutler and Breiman in \cite{cutler_archetypal_1994}.
+\rev{AA has the advantage to be more interpretable than NMF because the basis elements (\emph{i.e. endmembers}) are directly constructed from the data points (\emph{i.e. pixels}).}
+In addition, since the estimated endmembers spectral signatures generally correspond to averaging the contributions of several pixels, the resulting estimation appears to be more robust to noise and spectral variability than pure pixel methods \rev{that only select one pixel per endmember}.
+\rev{However, AA usually suffers from a high data fitting error because the basis elements are constrained to be contained in the convex cone of the data points~\cite{de_handschutter_near-convex_2019}.}
+
+\revision{The contributions and innovations of this article are as follows:}
+  \begin{enumerate}
+  \item We propose a new hyperspectral unmixing algorithm relying on entropic gradient descent for archetypal analysis. 
+  Our approach (i) provides solutions for hyperspectral unmixing \revision{as good as} traditional alternating optimization schemes based on projected gradient methods or active set algorithms, and (ii) allows more efficient GPU implementations.
+  \item The efficiency of our method enables us to make a key practical contribution, consisting of an ensembling mechanism along with an appropriate model selection procedure, which makes our method almost parameter-free and thus easy to use (the only sensitive parameter is the number of endmembers we want to estimate).
+  \item Our approach, available in an open-source package\footnote{Code is available at \href{https://github.com/inria-thoth/EDAA}{https://github.com/inria-thoth/EDAA}}, outperforms state-of-the-art matrix factorization and deep learning methods on six standard real datasets.
+  \end{enumerate}
+
+
+The remainder of this chapter is organized as follows.
+Section~\ref{sec:EDAA_method} introduces our method.
+Section~\ref{sec:EDAA_exp} presents experimental results highlighting the performance of our proposed approach.
+Finally, we conclude the article and underline future research directions in Section~\ref{sec:EDAA_ccl}.
+
+\section{Method}
+\label{sec:EDAA_method}
+In this section, we present our model formulation before describing its optimization. 
+Next, we mention implementation details required to run our approach. 
+Finally, we explain how to leverage our efficient GPU implementation and propose a procedure to make our model robust to hyper-parameter choices and thus easy to use in practice.
+
+\subsection{Model formulation}
+\label{subsec:assumptions}
+Under the linear mixing model (LMM) presented in (\ref{eq:LMM}), we recall the archetypal analysis formulation introduced in (\ref{eq:AA}):
+
+\begin{argmini}
+  {\B,\A}{\frac{1}{2}\|\Y - \Y \B \A\|_F^2,}{\label{eq:AA2}}{}
+  \addConstraint{\bb_{j}}{\in \Delta_n \; \text{for} \; 1 \leq j \leq r}
+  \addConstraint{\abold_{i}}{\in \Delta_r \; \text{for} \; 1 \leq i \leq n},
+\end{argmini}
+where $\B = \left[\bb_1, \ldots, \bb_r\right] \in \Real^{n \times r}$ is the pixel contributions matrix such that the endmembers matrix becomes $\Y \B$, and the columns of $\B$ are constrained to lie within the simplex $\Delta_n$, $\A = \left[\abold_1, \ldots, \abold_n\right] \in \Real^{r \times n}$ is the abundance matrix, and its columns are constrained to lie within the simplex $\Delta_r$.
+Finally, $\Y \in \Real^{p \times n}$ is the HS image containing $n$ spectra of length $p$, cast in two dimensions obtained by flattening the spatial dimensions.
+
+
+\subsection{Optimization}
+\label{subsec:optim}
+As explained in Section \ref{sub:intro_optim}, solving (\ref{eq:AA2}) is difficult since the objective function is not jointly convex in $(\A, \B)$.
+However, it is convex with respect to one of the variables when the other one is fixed, as demonstrated in \cite{morup_archetypal_2012}.
+We have seen in Section \ref{sub:intro_optim} that we essentially need to tackle a quadratic program (QP) under simplicial constraints -- \emph{e.g.}, (\ref{eq:QP2}) , that we recall here:
+\begin{equation}
+    \label{eq:QP3}
+    \min_{\abold \in \Delta_r} \left[f(\abold) = \parallel \yy - \Z \abold \parallel_2^2\right],
+\end{equation}
+where $\yy$ is in $\Real^p$, $\Z$ is in $\Real^{p \times r}$, $\abold$ is in $\Real^r$, and $f$ is a convex Lipschitz continuous function with a gradient at $\abold \in \Delta_r$ denoted by $\nabla f(\abold)$.
+
+In this chapter, we adopt entropic gradient descent as our optimization scheme.
+As introduced in Section \ref{subsubsec:EDA_intro}, it corresponds to considering the following update: for all $j$ in $\{1, \ldots, r\}$,
+\begin{equation}
+    \label{eq:update_EDAA_main2}
+    \abold_j^{k+1} = \frac{\abold_j^k e^{-\eta^k \nabla f (\abold^k)_j}}{\sum_{l=1}^r \abold_l^k e^{-\eta^k \nabla f (\abold^k)_l}},
+\end{equation}
+where $\abold_j^k$ is the $j$-th entry of the vector $\abold^k$ and similarly, $\nabla f(\abold^k)_j$ is the $j$-th entry of $\nabla f(\abold^k)$, and $\eta^k$ corresponds to a step size.
+
+We now detail the calculation that leads to (\ref{eq:update_EDAA_main2}).
+We start by writing the Lagrangian of (\ref{eq:QP3}) corresponding to the constraint $\sum_{j=1}^r \abold_j = 1$ using the definition of $D_h$ (\ref{eq:breg_div}), the Bregman divergence \cite{bregman_relaxation_1967} endowed by the negative entropy function $h$ (\ref{eq:neg_ent}):
+\revision{
+\begin{equation}
+    \label{eq:lagrangian}
+  %\begin{aligned}
+  \mathcal{L}(\abold, \nu) = \nabla f(\abold^k)^\top \abold + \frac{1}{\eta^k}\sum_{j=1}^d \abold_j \text{ln}(\abold_j) - \frac{1}{\eta^k}\sum_{j=1}^d\abold_j \text{ln}(\abold^k_j) + \nu \left( \sum_{j=1}^d \abold_j - 1 \right).
+  %\end{aligned}
+\end{equation}
 }
 
-%\smallskip
-\end{minipage}
-\smallskip
-\rule{0.7\linewidth}{.5pt}
-\end{center}
+Next, for $j \in \{1, \ldots, r\}$, we consider the derivative of $\mathcal{L}$ with respect to the $j$-th component of $\abold \in \Delta_r$:
+ \revision{
+ \begin{equation}
+   \label{eq:derivlagrangian}
+   \begin{aligned}
+     \nabla_{\abold_j} \mathcal{L}(\abold, \nu) = \nabla f(\abold^k)_j + \frac{1}{\eta^k} \text{ln}(\abold_j) - \frac{1}{\eta^k} \text{ln}(\abold_j^k) + \nu + \frac{1}{\eta^k},
+   \end{aligned}
+ \end{equation}
+}
+By considering the equation $\nabla_{\abold_j} \mathcal{L}(\abold, \nu) = 0$, we obtain:
 
-\minitoc
-\newpage
+\revision{\begin{equation}
+ \text{ln}(\abold_j) = \text{ln}(\abold_j^k) - \eta^k \nabla f(\abold^k)_j - \eta^k \nu - 1,
+ \end{equation}
+ }
+ \revision{and}
+ 
+ \revision{\begin{equation}
+   \abold_j^{k+1} = \abold_j^k e^{-\eta^k \nabla f(\abold^k)_j} e^{-\eta^k \nu - 1}.
+ \end{equation}}
+
+As a result, $\abold_j^{k+1} \geq 0$ and it remains to choose $\nu$ such that $\sum_{j=1}^r \abold_j^{k+1} = 1$ as done in (\ref{eq:update_EDAA_main2}), 
+
+Assuming that the entries of $\abold^k$ are positive, (\ref{eq:update_EDAA_main2}) can be efficiently implemented by using the softmax function:
+\begin{equation}
+    \label{eq:update_EDAA_softmax2}
+    \abold^{k+1} = \text{softmax} \left( \text{log}(\abold^k) - \eta^k \nabla f (\abold^k)\right),
+\end{equation}
+where $\text{log}(\abold^k)$ is the vector carrying the logarithm of each entry of $\abold^k$.
+
+We are now in shape to describe the alternating optimization scheme, by performing, alternatively, $K_1$ updates of entropic gradient descent for minimizing $\A$ when $\B$ is fixed, and vice versa using $K_2$ updates.
+This strategy is presented in Algorithm \ref{alg:EDAA}.
+Formally, by replacing the generic function~$f$ with the functions corresponding
+to the two optimization sub-problems, we obtain the following updates:
+\begin{equation} \label{eq:update_A}
+\A^{k+1} = \text{softmax}\left( \log(\A^k) + \eta_1^k \B^\top \Y^\top (\Y - \Y \B \A^k) \right),
+\end{equation}
+
+\begin{equation} \label{eq:update_B}
+  \B^{k+1} = \text{softmax}\left( \log(\B^k) + \eta_2^k \Y^\top (\Y - \Y \B^k \A) \A^\top \right),
+\end{equation}
+
+where $\log(\A^k)$ is the matrix carrying the logarithm of each entry of $\A^k$
+while $\text{softmax}$ is applied in parallel on the columns of $\log(\A^k) +
+\eta_1^k \B^\top \Y^\top (\Y - \Y \B \A^k)$. Note that when $\A$ and $\B$ are
+initialized with positive values, these iterates keep them positive.
+\rev{In addition, our optimization strategy does not require inverting any matrix contrarily to ADMM-based approaches~\cite{bioucas-dias_alternating_2010}.}
 
 
-\section{Section 1}
-\subsection{Sub-section 1}
-\blindtext
+\begin{algorithm}[h]
+  \caption{Entropic Descent Archetypal Analysis (EDAA)}\label{alg:EDAA}
+  \begin{algorithmic}[1]
+    \State \textbf{Input:} $\ell_2$-normalized data $\Y$ in $\Real^{p \times n}$; $r$ (number of
+    endmembers); $T$ (number of outer iterations); $K_1$ (number of inner
+    iterations for $\hat{\A}$); $K_2$ (number of inner iterations for $\hat{\B}$).
+    \State Initialize $\hat{\A}  \in \Real^{r \times n}$ using (\ref{eq:initA0}).
+    \State Initialize $\hat{\B} \in \Real^{n \times r}$ using (\ref{eq:initB0}).
 
-\subsection{Sub-section 2}
-\blindtext
+    \State Set $\eta_1$ according to (\ref{eq:eta0A}).
+    \State Set $\eta_2$ according to (\ref{eq:eta0B}).
+    \For{$t = 1,\ldots, T$}
+      \For{$k = 1,\ldots,K_1$} 
+      \State $\hat{\A} \gets \text{softmax}\left( \log(\hat{\A}) + \eta_1
+        \hat{\B}^\top \Y^\top (\Y - \Y \hat{\B} \hat{\A}) \right)$\\
+      \Comment{$\log$ is applied element-wise;}\\
+      \Comment{$\text{softmax}$ is applied along the first dimension.}
+      \EndFor
+      \For{$k = 1, \ldots, K_2$}
+      \State $\hat{\B} \gets \text{softmax} \left( \log(\hat{\B}) + \eta_2
+        \Y^\top (\Y - \Y \hat{\B} \hat{\A}) \hat{\A}^\top \right)$
+      \EndFor
+    \EndFor
+    \State $\hat{\E} \gets \Y \hat{\B}$
+    \State \textbf{Return} $\hat{\E}$, $\hat{\A}$ \Comment{Estimated endmembers, abundances.}
+  \end{algorithmic}
+\end{algorithm}
+
+\subsection{Implementation details}
+\label{subsec:details}
+
+\paragraph{Normalization}
+
+The input image $\Y = [\yy_1, \ldots, \yy_n]$ is $\ell_2$-normalized for
+each pixel: for all $i$ in $\{1, \ldots, n\}$,
+\begin{equation} \label{eq:normalization}
+  \yy_i \gets \frac{\yy_i}{||\yy_i||_2},
+\end{equation}
+where $\yy_i$ denotes the $i$-th pixel. 
+This step is important to gain invariance to illumination changes.
+
+
+\paragraph{Initialization}
+
+We initialize the abundance matrix $\A$ uniformly,
+
+\begin{equation}
+  \label{eq:initA0}
+  \hat{\A}^0 = \frac{1}{r} \1_r \1_n^T,
+\end{equation}
+where $\1_d$ denotes a $d$-dimensional vector of ones.
+This corresponds to the maximal entropy configuration for each pixel.
+The entropy for each pixel will naturally decrease as a result of the optimization, but the high entropy of the initialization will have a regularization effect.
+
+The initialization of the pixel contribution matrix $\B$ is then also close to uniform. 
+Nevertheless, we introduce a small random perturbation which is necessary to break the symmetry between the columns of $\B$ (otherwise, the updates of $\A$ and~$\B$ will keep them invariant).
+Concretely, the entries of $\B$ are randomly sampled according to the uniform distribution on $[0,1]$, $\mathcal{U}_{[0,1]}$.
+Next, they are rescaled by a factor $0.1$.
+Finally, we apply the softmax function on each column so that the columns of $\B$ belong to the simplex $\Delta_n$, for $j$ in $\{1, \ldots, r\}$,
+
+\begin{equation}
+  \label{eq:initB0}
+  \bb^0_j = \text{softmax}(0.1 \; \uu),
+\end{equation}
+where $\uu \sim \mathcal{U}_{[0,1]^n}$. In practice, we observe that such an initialization leads to 
+a matrix $\hat{\B}^0$ that is very close to a uniform initialization $\frac{1}{n} \1_n \1_r^T$.
+
+\paragraph{Step sizes}
+
+We use constant step sizes $\eta_1$ and $\eta_2$, for $\A$ and $\B$
+respectively.
+
+\begin{equation}
+  \label{eq:eta0A}
+  \eta_1 = \frac{\gamma}{\sigma^2_{\max}},
+\end{equation}
+where $\gamma$ is a value in $S = \{0.125, 0.25, 0.5, 1, 2, 4, 8\}$ and $\sigma_{\max}$ is the largest singular value of the matrix $\Y \B^0$.
+We recover the classical convergence of gradient descent with fixed step size \cite{nesterov_introductory_2003} up
+to the factor $\gamma$, since $\sigma^2_{\max}$ corresponds to the Lipschitz constant of the sub-problem
+related to (\ref{eq:AA2}) when minimizing w.r.t $\A$, $\B$ being fixed.
+Having $\gamma$ in $S$ allows us to use slightly different step sizes and yields better performance in practice. 
+Note that our model selection procedure, presented later, will automatically choose the right parameter $\gamma$, thus removing the burden for the user of having to deal with an extra hyper-parameter.
+Finally, $\eta_2$ is simply a rescaled version of $\eta_1$ to account for the matrices being of transposed dimensions:
+\begin{equation}
+  \label{eq:eta0B}
+  \eta_2 = \sqrt{\frac{r}{n}} \; \eta_1.
+\end{equation}
+
+\paragraph{Hyperparameters}
+
+For all experiments, \rev{if not stated otherwise}, we set $T=100$ and $K_1 = K_2 = 5$ as it provides a good trade-off between convergence speed and unmixing accuracy. 
+Note also that these hyper-parameters are robust to different real datasets as detailed in section \ref{sec:EDAA_exp}.
+
+\subsection{Model selection procedure}
+
+As stated above, the initialization of the matrix $\B$ is random, leading to different solutions for each run of the algorithm since the overall optimization problem is non convex. 
+Besides, we allow for different step-sizes $\gamma$, which we draw randomly from the set $S$ in practice.
+Since the convergence of the algorithm is very fast (see experimental section for concrete benchmarks), we are able to provide a large diversity of solutions given a dataset by running $M$ times our method with different random seeds, while keeping the global computational complexity reasonable.
+A major question we address next is then \emph{how to select optimally the best solution in terms of unmixing accuracy}.
+
+For this, we take inspiration from classical model selection and sparse estimation theory~\cite{hastie_elements_2009}. First, we measure the fit of each solution in terms of residual error $\|\Y - \Y\B\A\|_1$, choosing the $\ell_1$-norm which is known to be more robust to outliers than the mean squared error. 
+Second, we \emph{select} the set of solutions that are in the same ball park as the best solution we have obtained in terms of $\ell_1$ fit.
+This selection process is illustrated by the red dotted line in Figure~\ref{fig:MSP}, while the precise criterion is described in Algorithm~\ref{alg:criterion}.
+
+From the subset of solutions with good fit, we then choose the one whose endmembers have the best incoherence, a desired property, which is classical in the theory of sparse estimation~\cite{elad_generalized_2002, gribonval_sparse_2003, mairal_sparse_2014}. 
+Indeed, dictionaries (here endmembers) with more incoherence will benefit from better theoretical guarantees in terms of estimation of abundances, making it a natural criterion for model selection in the context of unmixing.
+Formally, the coherence is simply defined as the maximal pairwise spectral correlation between the estimated endmembers.
+More precisely, for $\hat{\E} = [\hat{\ee}_1, \ldots, \hat{\ee}_p]$ the endmembers matrix, the coherence $\mu$ is defined as:
+\begin{equation} \label{eq:coherence}
+\mu = \max_{k \neq k'}\langle \hat{\ee}_k, \hat{\ee}_{k'} \rangle,
+\end{equation}
+where $\langle . \rangle$ denotes the inner product.
+
+To the best of our knowledge, this is the first time the coherence $\mu$ is used as a model selection criterion for archetypal analysis. 
+Our experiments, see next section, show that it is highly effective.
+
+In summary, we automatically select the model whose endmembers have the lowest maximal pairwise spectral correlation among the ones that have a good $\ell_1$ fit.
+This strategy is illustrated in figure \ref{fig:MSP} and described in Algorithm \ref{alg:criterion}.
+In the experiments, the number of runs $M$ was set to 50.
+
+\begin{figure*}[h]
+  \centering
+  \subfloat[Samson]{\includegraphics[width=0.33\textwidth]{fichiers_latex/Chap2/figs/fit_Samson.png}}
+  \hfil
+  \subfloat[Jasper Ridge]{\includegraphics[width=0.33\textwidth]{fichiers_latex/Chap2/figs/fit_JR.png}}
+  \hfil
+  \subfloat[Urban4]{\includegraphics[width=0.33\textwidth]{fichiers_latex/Chap2/figs/fit_U4.png}}
+  \hfil
+  \subfloat[Urban6]{\includegraphics[width=0.33\textwidth]{fichiers_latex/Chap2/figs/fit_U6.png}}
+  \hfil
+  \subfloat[APEX]{\includegraphics[width=0.33\textwidth]{fichiers_latex/Chap2/figs/fit_APEX.png}}
+  \hfil
+  \subfloat[WDC]{\includegraphics[width=0.33\textwidth]{fichiers_latex/Chap2/figs/fit_WDC.png}}
+  \caption{\revision{Illustration of the model selection procedure on six datasets
+    using $M=50$ runs. Runs are illustrated by blue dots and the
+    selected one is in black. The selected run is the one with lowest coherence
+    $\mu$ under the dashed red line representing the $\ell_1$ fit threshold, see Alg.~\ref{alg:criterion}.}}
+  \label{fig:MSP}
+\end{figure*}
+
+
+\begin{algorithm}[h]
+  \caption{Model Selection Procedure}\label{alg:criterion}
+  \begin{algorithmic}[1]
+    \State \textbf{Input:} $M$ (number of runs); $\ell_2$-normalized data $\Y$ in $\Real^{p \times n}$; $r$ (number of
+    endmembers); $T$ (number of outer iterations); $K_1$ (number of inner
+    iterations for $\hat{\A}$); $K_2$ (number of inner iterations for $\hat{\B}$).
+    \For{$m = 1, \ldots, M$} 
+       \State Set random seed $s_m$.
+       \State $\hat{\E}_m, \hat{\A}_m \gets \text{EDAA}(\Y, r, T, K_1, K_2, s_m)$ 
+       \Comment{See (\ref{alg:EDAA})}
+       \State $\text{fit}_m \gets ||\Y - \hat{\E}_m \hat{\A}_m||_1$
+       % \State Compute maximal pairwise spectral correlation $\mu_m$ on $\hat{\E}_m$.
+       \State Compute coherence $\mu_m$ on $\hat{\E}_m$.
+       \Comment{See (\ref{eq:coherence})}
+    \EndFor
+    \State $\text{fit}_{\min} \gets \min \{ \text{fit}_1, \ldots, \text{fit}_M \}$
+    \State $\mathcal{I} \gets \{m \; | \; \text{fit}_m \leq 1.05 \times \text{fit}_{\min} \}$
+    \Comment{Subset of models.}
+    \State $\text{best} \gets \arg \min \{\mu_i, i \in \mathcal{I}\}$
+    \State \textbf{Return:} $\hat{\E}_{\text{best}}$, $\hat{\A}_{\text{best}}$.
+  \end{algorithmic}
+\end{algorithm}
+
+\section{Experiments}
+\label{sec:EDAA_exp}
+
+\revision{We have performed experiments on one simulated dataset with different noise and purity levels as well as six standard real datasets whose descriptions are given below.}
+
+\subsection{Data description}
+
+\begin{enumerate}
+
+\item Simulated dataset:
+\revision{For our study, we chose six endmembers from the USGS library and generated a 1000-pixel data cube using the methodology outlined in~\cite{ambikapathi_chance-constrained_2011}. This approach allowed us to vary the purity level of the pixels by adjusting the parameter $\rho$, which is used in Table \ref{table:sim}. Specifically, lower values of $\rho$ correspond to pixels that are less pure, while higher values indicate greater purity. By manipulating this parameter, we were able to simulate a range of real-world scenarios and evaluate the robustness of our algorithm under different conditions.}
+
+\item Samson: 
+  The Samson\footnote{downloaded at \href{https://rslab.ut.ac.ir/data}{https://rslab.ut.ac.ir/data}} hyperspectral
+image is a 95x95 pixels sub-region of a larger image captured using 156 bands spanning from 401 to 889 nm.
+Three main materials have been identified: Tree, Soil and Water.
+Note that we use a different ground truth from \cite{rasti_misicnet_2022} that we selected for its sharper details on the abundances.
+
+\item Jasper Ridge:
+\addtocounter{footnote}{-1}
+The Jasper Ridge\footnotemark~hyperspectral
+image is a 100x100 pixels sub-region of a larger image initially captured
+using 224 bands spanning from 380 to 2500 nm.
+In total, 198 bands remain as 26 were removed as a pre-processing step due to
+dense water vapor and atmospheric effects.
+Four main materials have been identified: Tree, Dirt, Water and Road.
+
+\item Urban4 and Urban6:
+\addtocounter{footnote}{-1}
+The Urban\footnotemark~hyperspectral image is a 307x307 pixels image collected by the
+Hyperspectral Digital Image Collection Experiment (HYDICE) \cite{rickard_hydice_1993} sensor using
+210 bands spanning from 400 to 2500 nm.
+In total, 162 bands remain as 48 were removed as a pre-processing step due to
+dense water vapor and atmospheric effects.
+There exists three versions of this dataset w.r.t. the number of endmembers.
+In this study, we focus on the two extremes: Urban4 contains 4 endmembers
+(Asphalt Road, Grass, Tree and Roof) and
+Urban6 contains two additional materials: Dirt and Metal, making it more challenging.
+
+\item APEX:
+The APEX \cite{schaepman_advanced_2015} hyperspectral image that we consider in
+this paper is a 111x122 pixels cropped region\footnote{downloaded at \href{https://github.com/BehnoodRasti/MiSiCNet}{https://github.com/BehnoodRasti/MiSiCNet}} of a larger image captured over
+285 bands spanning from 413 to 2420nm.
+Four main materials were identified: Road, Tree, Roof and Water.
+\rev{Note that the ground truth abundance map for water appears to contain shadows due to the sunlight direction (see figure~\ref{fig:APEX}). This is a common issue when dealing with real remote sensing data and we cannot expect the semi-automated ground truth abundances map generation to be perfect.}
+
+
+\item Washington DC Mall:
+\addtocounter{footnote}{-1}
+The Washington DC Mall (WDC) hyperspectral dataset\footnotemark~consists in a
+319x292 pixels image captured by the HYDICE \cite{rickard_hydice_1993} sensor
+over 191 bands spanning from 400 to 2400 nm.
+Six main materials were identified: Grass, Tree, Roof, Road, Water and Trail.
+
+\end{enumerate}
+
+According to \cite{zhu_hyperspectral_2017} (Samson, Jasper Ridge and Urban) and
+\cite{rasti_misicnet_2022} (APEX and WDC), the endmembers
+spectra were manually selected from the images and the ground truth abundances
+were set by the fully constrained least squares (FCLS) unmixing algorithm.
+Illustrations of the datasets and their ground truth endmembers are available in
+the supplementary material.
+
+\subsection{Experimental setup}
+
+\rev{
+We compare our approach to nine competitive methods from different unmixing
+categories:}
+
+\begin{itemize}
+
+  \item \rev{Geometrical unmixing baseline: FCLS \cite{heinz_fully_2001} using VCA
+    \cite{nascimento_vertex_2005} to extract endmembers.
+    Our implementation of the FCLS algorithm uses the \emph{DecompSimplex}
+    routine implemented in SPAMS\footnote{\href{http://thoth.inrialpes.fr/people/mairal/spams/}{http://thoth.inrialpes.fr/people/mairal/spams/}}.
+    This method relies on the active-set algorithm \cite{nocedal_numerical_1999}
+    that enables significantly faster convergence than generic quadratic
+    programming solvers by leveraging the underlying sparsity of the abundances
+    as noted by \cite{chen_fast_2014}.}
+
+  \item \rev{Deep learning unmixing: Endnet\footnote{implementation at \href{https://github.com/burknipalsson/hu\_autoencoders}{https://github.com/burknipalsson/hu\_autoencoders}}
+    \cite{ozkan_endnet_2018} using VCA \cite{nascimento_vertex_2005} to
+    initialize the endmembers, MiSiCNet\footnote{implementation at
+      \href{https://github.com/BehnoodRasti/MiSiCNet}{https://github.com/BehnoodRasti/MiSiCNet}}
+    \cite{rasti_misicnet_2022} and the deep unrolling network ADMMNet\footnote{no implementation available online} \cite{zhou_admm-based_2021}.}
+
+  \item \rev{NMF-based blind unmixing: minimum-volume-constraint non-negative matrix factorization (MVCNMF)\footnote{implementation found \href{https://www.dropbox.com/s/6pk77pgsz48o303/NCAA\_v1.zip?dl=0}{here}}~\cite{miao_endmember_2007}, non-negative matrix factorization quadratic
+    minimum volume (NMF-QMV)\footnote{implementation at
+      \href{https://github.com/LinaZhuang/NMF-QMV\_demo}{https://github.com/LinaZhuang/NMF-QMV\_demo}}
+    \cite{zhuang_regularization_2019} using the \emph{boundary} term as the
+    quadratic minimum volume penalty, near-convex archetypal analysis (NCAA)\footnote{implementation found \href{https://www.dropbox.com/s/6pk77pgsz48o303/NCAA\_v1.zip?dl=0}{here}}~\cite{de_handschutter_near-convex_2019} and AA \cite{cutler_archetypal_1994} using
+    the implementation from~\cite{chen_fast_2014} developed in SPAMS.}
+
+    \revision{The approach denoted as AA involves solving~(\ref{eq:AA2}) using an active-set method to optimize the convex sub-problems. This method is a conventional alternating approach that uses a fixed initialization ($\A$ and $\B$ entries are set to 0) and a fixed number of iterations ($T=100$). While AA is a well-known method, it has not been thoroughly evaluated on various real-world unmixing datasets. Therefore, we include it as a competing method in our study to compare its performance with other state-of-the-art algorithms. By using AA, we can also assess the improvements in optimization achieved by EDAA since the underlying model (\ref{eq:AA2}) is the same for both methods. This comparison enables us to gain insights into the benefits of EDAA for hyperspectral unmixing.}  
+
+    \item \rev{Finally, we include a recent technique addressing spectral variability: SeCoDe\footnote{implementation at \href{https://github.com/danfenghong/IEEE\_TGRS\_SeCoDe}{https://github.com/danfenghong/IEEE\_TGRS\_SeCoDe}}~\cite{yao_sparsity-enhanced_2021}.}
+\end{itemize}
+
+  
+To quantitatively evaluate the performance of the selected methods, we consider two metrics that are computed both globally and individually for each endmember.
+On one hand, we measure the quality of the generated abundances by means of the
+abundances root mean square error (RMSE) in percent between the ground truth and the
+estimated abundances:
+
+\begin{equation} \label{eq:RMSE}
+  \text{RMSE}(\A, \hat{\A}) = 100 \times \sqrt{\frac{1}{r n} \sum_{i=1}^r \sum_{j=1}^n \left( \A_{i, j} - \hat{\A}_{i, j} \right)^2}.
+\end{equation}
+
+On the other hand, we assess the quality of the estimated endmembers spectra by
+using the spectral angle distance (SAD) in degrees between the ground truth and
+the generated endmembers:
+
+\begin{equation}  \label{eq:SAD}
+  \text{SAD}(\E, \hat{\E}) = \frac{180}{\pi} \times \frac{1}{r} \sum_{i=1}^r \arccos \left( \frac{\langle \ee_i, \hat{\ee}_i \rangle}{||\ee_i||_2 ||\hat{\ee}_i||_2} \right),
+\end{equation}
+
+where $\ee_i$ denotes the
+$i$-th column of $\E$, \ie the spectrum of the $i$-th endmember.
+
+\subsection{Unmixing experiments}
+
+\begin{table}[h]
+  \centering
+  \captionof{table}{\revision{Abundances RMSE and endmembers SAD for the simulated dataset with different noise and purity levels. The best results are shown in bold. The second best results are underlined.}}
+  % \begin{adjustbox}{width=\textwidth}
+    \input{fichiers_latex/Chap2/tables/simulated}
+  % \end{adjustbox}
+  \label{table:sim}
+\end{table}
+
+\revision{
+Table~\ref{table:sim} presents the results of our unmixing accuracy evaluation on the simulated dataset. Our analysis indicates that the performance of the AA variants (active-set based and EDAA) is lower in scenarios where the pixels are highly mixed ($\rho=0.7$) when compared to geometrically motivated methods, such as MiSiCNet, MVCNMF and NMF-QMV, which do not rely directly on the pixel values to estimate the endmembers. However, it is worth noting that the EDAA method performs better than the plain AA method in this setting, thanks to its advanced model selection. In the case where pure pixels are present ($\rho=1.0$), the AA model formulation~(\ref{eq:AA2}) yields the best results, as it estimates the endmembers as convex combinations of the pixels. This approach is more robust to noise than the FCLS method. For the medium case ($\rho=0.85$), both AA and EDAA exhibit better performance than MiSiCNet and NMF-QMV for low Signal-to-Noise Ratio (SNR) due to their greater robustness to noise. However, they are outperformed by MiSiCNet and NMF-QMV for high SNR, as there are no pure pixels available for these methods to leverage.
+}
+
+\begin{table}[h]
+  \centering
+  \captionof{table}{Abundances RMSE on six real datasets. The best results are
+    shown in bold. The second best results are underlined.}
+  % \begin{adjustbox}{width=\textwidth}
+    \input{fichiers_latex/Chap2/tables/RMSE}
+  % \end{adjustbox}
+  \label{table:RMSE}
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \captionof{table}{Endmembers SAD on six real datasets. The best results are
+    shown in bold. The second best results are underlined.}
+  % \begin{adjustbox}{width=\textwidth}
+    \input{fichiers_latex/Chap2/tables/SAD}
+  % \end{adjustbox}
+  \label{table:SAD}
+\end{table}
+
+\begin{figure}[h]
+  \centering
+  \subfloat[]{\includegraphics[width=\textwidth]{fichiers_latex/Chap2/figs/JasperRidgeE-final.pdf}}
+  \hfil
+  \centering
+  \subfloat[]{\includegraphics[width=\textwidth]{fichiers_latex/Chap2/figs/JasperRidgeA-final.pdf}}
+  \caption{\rev{Estimated endmembers (a) and abundances (b) on the Jasper Ridge dataset.  Ground truth abundances are displayed on the right-most column.}}
+  \label{fig:JR}
+\end{figure}
+
+
+\begin{figure}[h]
+  \centering
+  \subfloat[]{\includegraphics[width=\textwidth]{fichiers_latex/Chap2/figs/ApexE-final.pdf}}
+  \hfil
+  \subfloat[]{\includegraphics[width=\textwidth]{fichiers_latex/Chap2/figs/ApexA-final.pdf}}
+  \caption{\rev{Estimated endmembers (a) and abundances (b) on the APEX dataset. Ground truth abundances are displayed on the right-most column.}}
+  \label{fig:APEX}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \subfloat[]{\includegraphics[width=0.66\textwidth]{fichiers_latex/Chap2/figs/WDCE-final.pdf}}
+  \hfil
+  \subfloat[]{\includegraphics[width=\textwidth]{fichiers_latex/Chap2/figs/WDCA-final.pdf}}
+  \caption{\rev{Estimated endmembers (a) and abundances (b) on the WDC dataset.  Ground truth abundances are displayed on the right-most column.}}
+  \label{fig:WDC}
+\end{figure}
+
+Tables \ref{table:RMSE} and \ref{table:SAD} report the unmixing accuracy in
+terms of abundances RMSE (\ref{eq:RMSE}) and endmembers SAD (\ref{eq:SAD}) on
+six standard real datasets.
+The datasets are arbitrarily ranked based on their difficulty.
+For a fair comparison, all methods were evaluated on the $\ell_2$-normalized
+data (\ref{eq:normalization}) which induces slight changes compared to the
+results reported in \cite{rasti_misicnet_2022}.
+
+\revision{Overall EDAA obtains the best abundances RMSE on five out of six real datasets. The results on Urban6 fall in favor of plain AA but the gap is moderate (12.83 vs 13.63) given that EDAA is more than seven times faster (594 versus 75 seconds) than plain AA on this dataset (see table \ref{table:cost}).}
+
+\revision{Note however that plain AA performs poorly on WDC where the ground truth endmembers are highly correlated.}
+We argue that our model selection technique is instrumental in avoiding
+collapsing runs in which endmembers spectra are highly correlated.
+This is underlined by the overall competitive SAD results obtained by EDAA
+across datasets.
+\revision{It should be noted that the SAD metric alone is not sufficient to assess the unmixing performance as a good SAD score does not necessarily lead to better abundance maps.
+Thus it is not contradictory to have slightly worse SAD scores yet better looking abundance maps.}
+
+The FCLS baseline based on VCA obtains rather poor results except for WDC.
+This is likely due to the pure pixel assumption. Indeed, VCA selects a single
+pixel to represent the endmembers spectra, which is too stringent in real
+scenarios where spectral variability is ubiquitous.
+
+Despite its quadratic minimum volume \emph{boundary} term, NMF-QMV generally
+obtains worse results than the FCLS baseline.
+Since it operates the unmixing in a subspace, NMF-QMV cannot prevent the endmembers spectra from having negative
+values, which breaks the physical interpretability of the estimates and
+subsequently harms the unmixing performance.
+This phenomenon can be observed in figures
+\ref{fig:JR},
+\ref{fig:APEX} and \ref{fig:WDC} for
+several endmembers.
+The associated abundances show that NMF-QMV produces maps that are too uniform and lack sparsity.
+
+\rev{In contrast, MVCNMF is a strong baseline as it does not operate in a subspace.}
+
+When it comes to deep learning based methods, Endnet achieves very good results in terms of SAD but tends to
+create overly sparse abundances which hinders its performance in terms of
+abundances RMSE.
+For instance, as can be seen in figure~\ref{fig:JR}, the
+Road endmember is overlooked by Endnet even though EDAA recovers it neatly.
+Likewise, in figure~\ref{fig:APEX}, the Road endmember spreads too much
+compared to EDAA which appears closer to the ground truth.
+
+MiSiCNet gives better unmixing results than Endnet in terms of abundances RMSE
+except for APEX although the SAD results falls in favor of Endnet except for
+Jasper Ridge.
+This is likely due to Endnet using the spectral angle distance on
+the input data in its loss which helps in achieving better SAD accuracy.
+However a good SAD is not sufficient to obtain good abundance maps, an area
+where MiSiCNet tends to shine as it incorporates spatial information by using
+convolutional filters and implicitly applying a regularizer on abundances.
+
+\rev{ADMMNet obtains rather poor results on all datasets, which is likely due to using ADMM to blindly solve 
+the linear mixing model rather than leveraging a known library.}
+
+\rev{SeCoDe works reasonably well on the Samson dataset due to its implementation available online that has been tailored to this dataset. However it does not perform as well on other datasets, which is likely due to requiring precise hyperparameters tuning depending on the data at hand.}
+
+\rev{NCAA obtains reasonable results due to its fine-tuning procedure but its computational cost is prohibitive as we will be discussing next.}
+
+\revision{Finally, the plain AA method leveraging an active-set algorithm is a very competitive method for five out of six datasets, yet its performance drops significantly when dealing with the hardest mixing scenario that is WDC.}
+
+For example, in figure~\ref{fig:JR} only
+AA and EDAA are able to uncover the Road endmember in Jasper
+Ridge whereas all the other techniques fail.
+
+\revision{Unlike EDAA, AA does not rely on a random initialization of the estimates as they are set to zeros in practice. 
+Instead, EDAA requires starting from feasible points w.r.t. the optimization sub-problems.
+In addition, the initial estimates in EDAA should not contain any zeros due to the presence of the logarithm in 
+(\ref{eq:update_EDAA_softmax2}).
+Thanks to the entropic gradient descent speed, it is possible to fit several models that have been randomly initialized as described in \ref{subsec:details} and use the model selection procedure presented in Algorithm \ref{alg:criterion} which selects the model that exhibits the lowest coherence among the pool of candidates that are well fitted.
+Notably, this approach prevents the estimated endmembers from \emph{collapsing} into degenerate solutions that would end up being perfectly correlated.
+This likely explains why the performance of plain AA on WDC drops as the endmembers are highly correlated.
+}
+
+\rev{Additional qualitative results for the Samson, Urban4 and Urban6 datasets can be found
+in the supplementary material.}
+\revision{Moreover, we have also included the results on a 250$\times$191 pixels subset of the Cuprite dataset, which is more challenging and does not come with ground truth abundance maps.}
+
+\subsection{Computational cost}
+
+Table \ref{table:cost} reports the processing times for the different unmixing
+algorithms on the six real datasets. 
+\rev{MVCNMF, NMF-QMV, SeCoDe and NCAA were implemented in Matlab (2020b) while
+FCLS, Endnet, MiSiCNet, ADMMNet and the AA variants were implemented in Python (3.8).
+NMF-QMV, MVCNMF, SeCoDe, NCAA, FCLS and AA run on CPU whereas Endnet, MiSiCNet, ADMMNet and EDAA run on GPU.}
+The processing times were obtained using a computer with an Intel(R) Xeon(R)
+Silver 4110 processor (2.10 GHz), 32 cores, 64GB of memory, and a NVIDIA
+GeForce RTX (2080 Ti) graphical processing unit.
+The table shows that FCLS is clearly faster than the other unmixing techniques,
+however it is a supervised method that relies on an endmembers extraction
+algorithm. In this case, VCA is used which is also fast.
+The deep learning methods are the slowest techniques despite running on GPU.
+Interestingly, EDAA requires a lower computational cost than NMF-QMV and AA although our approach consists in aggregating 50 runs obtained
+iteratively. 
+For example, it takes on average 1.5 seconds for EDAA to perform a single unmixing
+task on the Urban6 dataset, which is three times faster than FCLS. 
+This demonstrates the efficiency of EDAA which allows us to use an
+adequate model selection procedure over several runs.
+\rev{Note that the processing time of NCAA is prohibitive due to its fine-tuning component despite using a fast projected gradient method.}
+
+\begin{table*}[h]
+  \centering
+  \captionof{table}{Processing times in seconds on six real datasets. The best
+    results are in bold and the second best underlined. EDAA includes the model
+    selection procedure over $M=50$ runs.}
+  \begin{adjustbox}{width=\textwidth}
+    \input{fichiers_latex/Chap2/tables/compute_time}
+  \end{adjustbox}
+  \label{table:cost}
+\end{table*}
+
+\subsection{Ablation study}
+
+Finally, we study the sensitivity to hyper-parameters for Algorithm \ref{alg:EDAA} and
+\ref{alg:criterion} in figure \ref{fig:ablation} where the Y-axis corresponds to the
+overall abundances RMSE.
+Given a fixed computational budget of 1000 updates, figure \ref{fig:ablation}
+(a) shows that the hyper-parameters of EDAA are robust provided that the number
+of runs $M$ in the model selection is large enough (here 100). Only the two extremes
+configurations ($K_1=K_2=1$, $T=500$ and $K_1=K_2=50$, $T=10$) are slightly
+worse, especially on Urban6.
+For the remaining experiments, we use $K_1=K_2=5$.
+In figure \ref{fig:ablation} (b), we see that the number of outer iterations is
+quite stable except for WDC which requires more updates (1000, \ie $T=100$).
+Finally, we study the importance of the number of runs $M$ from which to select
+the best candidate in figure \ref{fig:ablation} (c).
+We observe that the model selection procedure requires at least 50 runs to
+obtain very good performances, hence we use $M=50$ in our unmixing experiments.
+On unknown datasets where real-time unmixing is not required, it is advised to
+use a large number of runs (at least 100) to ensure that the model selection
+procedure yields a good candidate.
+Detailed results for both abundances RMSE and SAD metrics are available in the
+supplementary material.
+
+\begin{figure}[]
+  \centering
+  \subfloat[]{\includegraphics[width=0.33\textwidth]{fichiers_latex/Chap2/figs/alg1_constant.pdf}}
+  \hfil
+  \subfloat[]{\includegraphics[width=0.33\textwidth]{fichiers_latex/Chap2/figs/alg1_T.pdf}}
+  \hfil
+  \subfloat[]{\includegraphics[width=0.33\textwidth]{fichiers_latex/Chap2/figs/alg2.pdf}}
+  \caption{Sensitivity analysis to the hyperparameters in Algorithms
+    \ref{alg:EDAA} and \ref{alg:criterion} measured in global abundances RMSE: (a) Varying
+  inner and outer iterations $K_1, K_2$ and $T$ for a constant number of updates
+  (1000) and runs $M=100$, (b) Varying
+outer iterations $T$ using $K_1=K_2=5$ and (c) Varying number of runs $M$ using
+$K_1=K_2=5$ and $T=100$.}
+  % \caption{Samson dataset: (a) False colors RGB image (Red: 83rd band, Green: 43, Blue: 9) (b)
+  % $\ell_2$-normalized ground truth endmembers.}
+  \label{fig:ablation}
+\end{figure}
+
+\section{Conclusion}
+\label{sec:EDAA_ccl}
+
+We have proposed a new algorithm based on archetypal analysis for blind
+hyperspectral unmixing.
+We have shown how to take advantage of its efficient GPU implementation in order
+to develop an adequate model selection procedure to obtain state-of-the-art
+performances.
+Remarkably, our simple and easy-to-use approach considerably improves the unmixing
+results on a comprehensive collection of standard real datasets.
+In addition, we have made our results reproducible by releasing an open source
+codebase which also includes the plain archetypal analysis variant presented in this study.
+\rev{While this paper was under review, we also investigated in~\cite{rasti_sunaa_2023} the problem of semi-supervised unmixing by using a variant of archetypal analysis, showing that such a framework may be useful beyond the problem of blind unmixing that we address here.}
+\revision{Finally, it is worth noting that our approach does not consider the spatial structure of the data. This feature suggests that a natural extension to our approach would be to incorporate missing spatial information, which could potentially improve the accuracy of our results.}
+
+\chapter*{Appendix}
+
+\section{Datasets description}
+
+In this section, we provide illustrations of the unmixing datasets
+used in the experiments. Each dataset is described with a false-color RGB image
+alongside the $\ell_2$-normalized ground truth endmembers.
+
+
+  \begin{figure}[h]
+    \centering
+    \subfloat[]{\includegraphics[height=1in]{fichiers_latex/Chap2/figs/SamsonY_GT.png}}
+    \hfil
+    \subfloat[]{\includegraphics[height=1in]{fichiers_latex/Chap2/figs/SamsonE_GT.png}}
+    \caption{Samson dataset: (a) False colors RGB image (Red: 83rd band, Green: 43, Blue: 9) (b)
+    $\ell_2$-normalized ground truth endmembers.}
+    \label{fig:samson}
+  \end{figure}
+
+  \begin{figure}[h]
+    \centering
+    \subfloat[]{\includegraphics[height=1in]{fichiers_latex/Chap2/figs/JasperRidgeY_GT.png}}
+    \hfil
+    \subfloat[]{\includegraphics[height=1in]{fichiers_latex/Chap2/figs/JasperRidgeE_GT.png}}
+    \caption{JasperRidge dataset: (a) False colors RGB image (Red: 130th band, Green: 50, Blue:
+    5) (b) $\ell_2$-normalized ground truth endmembers.}
+    \label{fig:jasper}
+  \end{figure}
+
+  \begin{figure}[h]
+    \centering
+    \subfloat[]{\includegraphics[height=1in]{fichiers_latex/Chap2/figs/UrbanY_GT.png}}
+    \hfil
+    \subfloat[]{\includegraphics[height=1in]{fichiers_latex/Chap2/figs/Urban6E_GT.png}}
+    \caption{Urban dataset: (a) False colors RGB image (Red: 130th band, Green: 70, Blue: 30) (b)
+    $\ell_2$-normalized ground truth endmembers for Urban6. Urban4 corresponds to the first 4
+    materials.}
+    \label{fig:urban_GT}
+  \end{figure}
+  
+  \begin{figure}[h]
+    \centering
+    \subfloat[]{\includegraphics[height=1in]{fichiers_latex/Chap2/figs/APEXY_GT.png}}
+    \hfil
+    \subfloat[]{\includegraphics[height=1in]{fichiers_latex/Chap2/figs/APEXE_GT.png}}
+    \caption{APEX dataset: (a) False colors RGB image (Red: 200th band, Green: 100, Blue: 10) (b)
+    $\ell_2$-normalized ground truth endmembers (\#0: Road, \#1: Tree, \#2: Roof,
+    \#3: Water).}
+    \label{fig:apex}
+  \end{figure}
+
+  \begin{figure}[h]
+    \centering
+    \subfloat[]{\includegraphics[height=1in]{fichiers_latex/Chap2/figs/WDCY_GT.png}}
+    \hfil
+    \subfloat[]{\includegraphics[height=1in]{fichiers_latex/Chap2/figs/WDCE_GT.png}}
+    \caption{Washington DC Mall dataset: (a) False colors RGB image (Red: 150th band, Green: 75,
+    Blue: 20) (b) $\ell_2$-normalized ground truth endmembers (\#0: Grass, \#1:
+    Tree, \#2: Road, \#3: Roof, \#4: Water, \#5: Trail).}
+    \label{fig:wdc}
+  \end{figure}
+
+\section{Additional results}
+
+We provide qualitative results on the Samson, Urban4 and Urban6 datasets in figures~\ref{fig:Samson}, ~\ref{fig:Urban4} and ~\ref{fig:Urban6}.
+
+\begin{figure}[h]
+  \centering
+  \subfloat[]{\includegraphics[width=\textwidth]{fichiers_latex/Chap2/figs/SamsonE-final.pdf}}
+  \hfil
+  \subfloat[]{\includegraphics[width=\textwidth]{fichiers_latex/Chap2/figs/SamsonA-final.pdf}}
+  \caption{\rev{Estimated endmembers (a) and abundances (b) on the Samson dataset. Ground truth abundances are displayed on the right-most column.}}
+  \label{fig:Samson}
+\end{figure}
+
+
+\begin{figure}[h]
+  \centering
+  \subfloat[]{\includegraphics[width=\textwidth]{fichiers_latex/Chap2/figs/Urban4E-final.pdf}}
+  \hfil
+  \subfloat[]{\includegraphics[width=\textwidth]{fichiers_latex/Chap2/figs/Urban4A-final.pdf}}
+  \caption{\rev{Estimated endmembers (a) and abundances (b) on the Urban4 dataset. Ground truth abundances are displayed on the right-most column.}}
+  \label{fig:Urban4}
+\end{figure}
+
+\begin{figure}[h]
+  \centering
+  \subfloat[]{\includegraphics[width=0.66\textwidth]{fichiers_latex/Chap2/figs/Urban6E-final.pdf}}
+  \hfil
+  \subfloat[]{\includegraphics[width=\textwidth]{fichiers_latex/Chap2/figs/Urban6A-final.pdf}}
+  \caption{\rev{Estimated endmembers (a) and abundances (b) on the Urban6 dataset.  Ground truth abundances are displayed on the right-most column.}}
+  \label{fig:Urban6}
+\end{figure}
+
+\paragraph{Cuprite dataset}
+
+\revision{
+In order to evaluate the performance of the selected methods, we provide qualitative results on a 191 $\times$ 250 pixels subset of the Cuprite dataset, which is only accompanied by a geological map of the main materials present in the scene (see Fig.\ref{Real dataset}(a)). Recovering the spectral signatures of interest in this dataset is a challenging task due to the similarity of their spectral signatures and the presence of significant spectral variability. All methods were asked to output abundance maps for $r=5$ unknown endmembers. As shown in Fig.\ref{Real dataset}(b), all methods successfully recovered the three dominant materials of interest, namely Chalcedony, Alunite, and Kaolinite. However, we observed that MiSiCNet, AA, and EDAA produced sharper abundance maps than FCLS and NMFQMV. It is worth noting that we could not provide results for Endnet due to its outdated code base. Moreover, we had to increase the number of outer iterations for EDAA to 1000 to obtain meaningful results, while AA iterations could be kept at 100. Finally, we found that the $\ell_1$ fitting criterion was not satisfactory and had to be replaced with $\ell_2$ for this particular dataset.}
+
+\begin{figure} [h]
+\centering
+\begin{tabular}{cc} 
+\includegraphics[width=.20\textwidth]{fichiers_latex/Chap2/figs/GRMap_Cup.png}&
+\includegraphics[width=.70\textwidth]{fichiers_latex/Chap2/figs/Cuprite_A.pdf}\\
+ (a) Geological Map & (b) Estimated abundance maps
+ \end{tabular} %\end{center} 
+\caption{
+\revision{Abundance maps of three dominant minerals estimated using different blind unmixing techniques applied to the Cuprite dataset.}
+}
+\label{Real dataset}
+\end{figure}
+
+
+\paragraph{Ablation study}
+
+We report the detailed results obtained in the ablation study.
+For each dataset, the overall abundances RMSE and SAD are computed for all configurations.
+Table \ref{table:alg2} underlines the importance of the number of runs
+$M$ in the model selection procedure.
+Table \ref{table:alg1_decrease} studies the sensitivity of the outer iterations $T$ in EDAA when we decrease the computational budget.
+Finally, table \ref{table:alg1_constant} studies the sensitivity of the inner and outer
+iterations $K_1$, $K_2$ and $T$ in EDAA given a fixed computational budget.
+
+\begin{table}[h]
+\centering
+  \captionof{table}{Sensitivity to the number of outer iterations $T$ of Algorithm
+    EDAA with $K_1=K_2=5$. The abundances RMSE and SAD metrics are computed globally. The best results are in bold and the second best are underlined.}
+    \input{fichiers_latex/Chap2/tables/alg1_decrease}
+  \label{table:alg1_decrease}
+\end{table}
+
+\begin{table}[h]
+  \captionof{table}{Sensitivity to the number of runs $M$ of the model selection
+    procedure with $K_1=K_2=5$ and $T=100$. The abundances RMSE and SAD metrics are computed globally. The best results are in bold and the second best are underlined.}
+    \input{fichiers_latex/Chap2/tables/alg2}
+  \label{table:alg2}
+\end{table}
+
+\begin{table}[h]
+  \captionof{table}{Sensitivity to hyperparameters of EDAA
+    for a constant number of updates (1000). The abundances RMSE and SAD metrics are computed globally. The best results are in bold and the second best are underlined.}
+  \begin{adjustbox}{width=\textwidth}
+    \input{fichiers_latex/Chap2/tables/alg1_constant}
+  \end{adjustbox}
+  \label{table:alg1_constant}
+\end{table}
 
 
 
-
-
-\section{Section 2}
-\subsection{Sub-section 1}
-\blindtext
-
-\subsection{Sub-section 2}
-\blindtext

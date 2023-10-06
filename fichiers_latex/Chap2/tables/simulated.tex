@@ -1,0 +1,71 @@
+\resizebox{\textwidth}{!}{
+\begin{tabular}{c|c|ccc|ccc}
+\toprule
+\multirow{3}{*}{Methods} & \multirow{3}{*}{$\rho$} & \multicolumn{3}{c|}{RMSE}                                                   & \multicolumn{3}{c}{SAD}                               \\ \cline{3-8} 
+                         &                      & \multicolumn{3}{c|}{SNR (dB)}                                               & \multicolumn{3}{c}{SNR (dB)}                          \\ \cline{3-8} 
+                         &                      & \multicolumn{1}{c|}{20} & \multicolumn{1}{c|}{30} & \multicolumn{1}{c|}{40} & \multicolumn{1}{c|}{20} & \multicolumn{1}{c|}{30} & 40 \\ \hline
+\multirow{3}{*}{FCLS \cite{heinz_fully_2001}}   
+      & 0.7     &  16.53   &   17.15   &   17.97   &   7.20    &   7.18    & 7.38  \\
+     & 0.85     &  12.96   &   11.44   &  10.15    &   3.86    &  3.05     &  2.45  \\
+      & 1.0     &  8.03   &  4.43    &  3.31    &   1.84    &   0.58    &  \textbf{0.17}  \\ 
+\hline
+%\multirow{3}{*}{MiSiCNet \cite{rasti_misicnet_2022}}   
+%      & 0.7      &  28.01   &  27.78    &   26.91   &   14.35    &   14.43    &  14.45 \\
+%      & 0.85     &   15.35  &  15.58    &   15.63   &   12.92    &    12.95   &  12.97  \\
+%      & 1.0      &  3.04   &   3.03   &  3.04    &   11.99    &   12.07    &   12.08 \\ 
+%\hline
+\multirow{3}{*}{MiSiCNet \cite{rasti_misicnet_2022} ($\lambda=0.1$)}   
+      & 0.7      &  \underline{10.60}   &  \underline{8.64}   &   \underline{8.31}   &   \textbf{3.94}   &   \textbf{1.88}   &  \textbf{1.58} \\
+      & 0.85     &   13.76  &   8.62  &   \underline{7.68}   &   4.70   &  1.20    &  \textbf{0.75}  \\
+      & 1.0      &   15.08  &  6.42   &  3.73    &   5.11   &   1.12   &  0.39  \\ 
+\hline
+\multirow{3}{*}{\rev{ADMMNet} \cite{zhou_admm-based_2021}}   
+      & 0.7      &   15.49  &  16.92    &  16.68   &   11.44    &  13.76   &  13.48 \\
+      & 0.85     &  17.18   &   19.54   &  19.58   &   8.52    &  10.23   &  9.93 \\
+      & 1.0      &   21.13  &  16.57    &  16.60   &   9.03    &   6.26  &  6.55 \\
+\hline
+\multirow{3}{*}{\rev{MVCNMF} \cite{miao_endmember_2007}}   
+      & 0.7      &   15.80  &   9.75   &  15.53   &    6.85   &  2.52   &  6.85 \\
+      & 0.85     &  9.88   &   9.80   &  9.54   &    \textbf{1.85}   &  \textbf{1.16}   &  \underline{0.76} \\
+      & 1.0      &   6.84  &   7.03   &   3.55  &   1.12    &  0.78   &  \textbf{0.17} \\
+\hline
+\multirow{3}{*}{NMFQMV \cite{zhuang_regularization_2019}}   
+      & 0.7      &  \textbf{10.11}   &   \textbf{8.32}   &   \textbf{7.36}   &   \underline{4.96}    &   \underline{4.76}    &  \underline{3.32} \\
+      & 0.85     &  10.58   &   \textbf{7.11}   &  \textbf{6.79}    &   2.91    &   \underline{1.18}    &  0.98  \\
+      & 1.0      &   11.24  &   6.62   &   3.80   &   3.25    &  1.54     &  0.41  \\
+\hline
+
+\multirow{3}{*}{\rev{SeCoDe} \cite{yao_sparsity-enhanced_2021}}   
+           & 0.7      &  13.49   &   13.36   &  13.62   &   16.06    &  16.38   &  16.54 \\
+      & 0.85     &  13.56   &   14.76   &  14.69   &  14.62     &   15.79  & 15.73  \\
+      & 1.0      &   7.88  &   4.74   &  4.35   &    7.76   &   5.07  &  4.76 \\
+\hline
+\multirow{3}{*}{\rev{NCAA} \cite{de_handschutter_near-convex_2019}}   
+           & 0.7      &   14.62  &   13.43   &   14.64  &   8.32    &   8.00  &  7.44 \\
+      & 0.85     &  12.15   &   7.66   &  7.19   &   5.72    &  2.56   &  1.10 \\
+      & 1.0      &   11.61  &   \underline{3.20}   &  3.25   &    5.37   &  1.70   &  0.71 \\
+\hline
+
+
+\multirow{3}{*}{AA ($T=100$)}   
+      & 0.7      &  17.67   &   17.23   &  17.18    &   7.61    &   6.71    &  6.43 \\
+      & 0.85     &   \underline{9.44}  &  \underline{8.23}    &   8.04   &   \underline{2.55}    &   2.09    &  1.86  \\
+      & 1.0      &   \textbf{5.13}  &   \textbf{2.98}   &   \textbf{2.75}   &   \textbf{0.88}    &   \textbf{0.45}    &  0.34  \\ 
+\hline
+%\multirow{3}{*}{EDAA}   
+%      & 0.7      &   15.87  &   15.93   &   15.66   &   7.73    &    6.87   &  6.85 \\
+%      & 0.85     &  13.03   &   11.59   &   11.48   &   2.96    &   2.32    &  2.23  \\
+%      & 1.0      &   8.67  &   6.79   &   6.55   &   1.07    &   0.53    &  0.39  \\ 
+%\hline
+%\multirow{3}{*}{EDAA ($K_1=K_2=20$)}   
+%      & 0.7      &   15.76   &  14.33   &   15.04   &   6.27   &   5.62   &  5.78 \\
+%      & 0.85     &  9.94   &  8.99   &  8.70    &   2.74   &   2.33   &  1.97  \\
+%      & 1.0      &  7.38   &  3.74   &   3.23   &   1.07   &  0.54    &  0.34  \\
+%\hline
+\multirow{3}{*}{EDAA ($K_1=K_2=30$)}   
+      & 0.7      &   14.35   &  13.75   &   14.91   &   5.50   &   5.01   &  6.52 \\
+      & 0.85     &  \textbf{8.84}   &  8.37   &  8.37    &   2.63   &   2.18   &  1.92  \\
+      & 1.0      &  \underline{5.82}   &  4.26   &   \underline{2.89}   &   \underline{0.96}   &  \underline{0.51}    &  0.33  \\
+\bottomrule
+\end{tabular}
+}

@@ -3,15 +3,10 @@
 %%%%%                           General Conclusion                     %%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\phantomsection 
-\addcontentsline{toc}{chapter}{Conclusion and perspectives}
-\addtocontents{toc}{\protect\addvspace{10pt}}
-
-\vspace*{-1cm}
-\begin{flushright}
-\section*{\fontsize{20pt}{20pt}\selectfont\textnormal{Conclusion and perspectives}}
-\end{flushright}
-\vspace{2cm}
+\chapter{Conclusion and perspectives}
+\label{ch:ccl}
+%\end{flushright}
+%\vspace{2cm}
 
 \lhead[\fancyplain{}{Conclusion and perspectives}]
       {\fancyplain{}{}}
@@ -30,4 +25,59 @@
 %%%%%                      Start part here                          %%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-Conclusion here 
+In this thesis, we have developed efficient and interpretable algorithms aimed at addressing essential challenges in hyperspectral data analysis, specifically focusing on image restoration and spectral unmixing.
+
+First, we introduced a novel sparse coding-based unfolding algorithm designed for the representation of hyperspectral images.
+
+Furthermore, we leveraged an established model-based framework known as archetypal analysis to tackle various unmixing scenarios, offering valuable insights and solutions for spectral unmixing tasks.
+
+To facilitate the practical application of these methods, we have also developed a Python-based toolbox tailored for hyperspectral unmixing.
+This toolbox empowers practitioners to readily evaluate and compare multiple unmixing techniques on their own datasets, enhancing accessibility and usability in the hyperspectral research community.
+
+\section{Contributions summary}
+
+Here we summarize the contributions presented in this thesis.
+
+\paragraph{Unfolding sparse coding to restore hyperspectral images}
+
+Our first contribution investigate data-efficient and interpretable models for hyperspectral image restoration, by encoding prior knowledge used in the dictionary learning literature into an end-to-end trainable network architecture.
+In Chapter \ref{ch:T3SC}, we introduce a novel two-layered model-based deep learning method called T3SC. 
+The primary objective of T3SC is to provide effective denoising of hyperspectral images while maintaining interpretability.
+The efficiency of our approach proved to be key to handle the limited availability of training data for hyperspectral denoising.
+In addition, our principled architecture, namely the sensor specific first spectral layer followed by a sensor agnostic spectral-spatial layer, is tailored to the specificity of hyperspectral images that are typically acquired by various sensors with different characteristics.
+
+\paragraph{Modeling spectral unmixing using archetypal analysis}
+
+Our second and third contributions draw significant inspiration from the interpretability offered by the archetypal analysis framework.
+In Chapter \ref{ch:EDAA} we demonstrate the viability of archetypal analysis for blind hyperspectral unmixing within the linear mixing model.
+To efficiently tackle this challenge, we introduce a novel optimization scheme known as entropic gradient descent, specifically tailored for solving the archetypal analysis formulation.
+Notably, our approach is highly compatible with GPU computation, and its computational efficiency enables us to develop a robust model selection procedure that mitigates the challenges posed by hyperparameter choices.
+In Chapter \ref{ch:SUnAA} we extend our approach to semi-supervised unmixing, emphasizing its advantages in addressing discrepancies between endmembers extracted from a library and those encountered in the actual scene.
+To facilitate the optimization process, we employ an active-set algorithm that leverages the inherent sparsity of solutions within the quadratic program, while enforcing simplicial constraints.
+
+
+\paragraph{Enabling simple benchmarks for hyperspectral unmixing}
+Finally, in Chapter \ref{ch:HySUPP}, we draw a critical comparison of different unmixing techniques, classified into supervised, semi-supervised and blind unmixing categories.
+To enhance accessibility and usability, we introduce an open-source Python toolbox that offers users a wide array of unmixing techniques suitable for their specific datasets.
+This toolbox facilitates benchmarking across a range of popular approaches using both simulated and real datasets, enabling a comprehensive assessment of their respective merits and limitations.
+
+
+\section{Future research and perspectives}
+
+Based on the contributions of this thesis, several questions and research directions arise and would be interesting to investigate in the future.
+
+\paragraph{Remaining challenges in spectral unmixing}
+
+Despite significant advancements, spectral unmixing remains one of the most challenging tasks in hyperspectral analysis.
+Below, we briefly outline some of the primary challenges encountered in spectral unmixing:
+\begin{itemize}
+    \item Linear models, while generally versatile, may experience a significant drop in performance when applied to different datasets.
+    \item The selection of appropriate parameters significantly impacts the effectiveness of unmixing methods, and optimizing them for real-world datasets is particularly challenging.
+    \item Linear unmixing methods often exhibit degraded performance as the number of endmembers increases, potentially failing on datasets with numerous endmembers.
+    \item Spectral variability poses a major challenge, as it can significantly reduce the performance of linear unmixing techniques.
+    \item The absence of real datasets with ground truth is a significant impediment.
+    \item Multi-temporal and multi-source spectral unmixing tasks present additional complexities.
+    \item Given the large volume of HS data, scalable unmixing approaches are crucial for global monitoring.
+\end{itemize}
+
+These challenges highlight the ongoing efforts and research needed to enhance the robustness and adaptability of spectral unmixing methods in various applications.
